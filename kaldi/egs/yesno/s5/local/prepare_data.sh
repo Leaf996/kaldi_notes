@@ -2,7 +2,7 @@
 
 mkdir -p data/local
 local=`pwd`/local
-scripts=`pwd`/scripts
+scripts=`pwd`/scripts         # un-used
 
 export PATH=$PATH:`pwd`/../../../tools/irstlm/bin
 
