@@ -12,19 +12,19 @@ train_base_name=train_yesno
 test_base_name=test_yesno
 waves_dir=$1
 
-ls -1 $waves_dir > data/local/waves_all.list
+ls -1 $waves_dir > data/local/waves_all.list                                              # 生成wavelist文件
 
 cd data/local
 
-../../local/create_yesno_waves_test_train.pl waves_all.list waves.test waves.train
+../../local/create_yesno_waves_test_train.pl waves_all.list waves.test waves.train        # split test and train dataset
 
-../../local/create_yesno_wav_scp.pl ${waves_dir} waves.test > ${test_base_name}_wav.scp
+../../local/create_yesno_wav_scp.pl ${waves_dir} waves.test > ${test_base_name}_wav.scp   # generate wav.scp
 
-../../local/create_yesno_wav_scp.pl ${waves_dir} waves.train > ${train_base_name}_wav.scp
+../../local/create_yesno_wav_scp.pl ${waves_dir} waves.train > ${train_base_name}_wav.scp # generate wav.scp
 
-../../local/create_yesno_txt.pl waves.test > ${test_base_name}.txt
+../../local/create_yesno_txt.pl waves.test > ${test_base_name}.txt                        # generate text
 
-../../local/create_yesno_txt.pl waves.train > ${train_base_name}.txt
+../../local/create_yesno_txt.pl waves.train > ${train_base_name}.txt                      # generate text
 
 cp ../../input/task.arpabo lm_tg.arpa
 
@@ -35,6 +35,6 @@ for x in train_yesno test_yesno; do
   mkdir -p data/$x
   cp data/local/${x}_wav.scp data/$x/wav.scp
   cp data/local/$x.txt data/$x/text
-  cat data/$x/text | awk '{printf("%s global\n", $1);}' > data/$x/utt2spk   # what the fuck ?
-  utils/utt2spk_to_spk2utt.pl <data/$x/utt2spk >data/$x/spk2utt
+  cat data/$x/text | awk '{printf("%s global\n", $1);}' > data/$x/utt2spk               # $1 : the first field
+  utils/utt2spk_to_spk2utt.pl <data/$x/utt2spk >data/$x/spk2utt                         # generate spk2utt
 done

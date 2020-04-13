@@ -18,7 +18,7 @@ rm -rf data exp mfcc
 local/prepare_data.sh waves_yesno
 local/prepare_dict.sh
 
-# generate word_list, phone_topo, L.fst
+# generate word_list, phone_topo, L.fst， convert lexicon to fst
 utils/prepare_lang.sh --position-dependent-phones false data/local/dict "<SIL>" data/local/lang data/lang
 
 # generate G.fst

@@ -27,6 +27,8 @@
 - [**kaldi-yesno-tutorial**][7]
 - [**kaldi yesno example**][8]
 - [**Kaldi(A4)model文件分析**][9]
+- [**hand-book-of-speech-enhancement-and-recognition**][10]
+- [**Some Kaldi Notes**][11]
 ## Question
 - optional_silence.txt的作用 ?
 - [extra_questions.txt][6]的作用 ?
@@ -35,6 +37,19 @@
 - tree文件可视化
 - compile-train-graph
 - .ark文件的可视化
+- \<eps>:`means "no symbol here"`
+- fst.1.gz : format ?
+## Optional
+- segments:包括每个录音的发音分段/对齐信息
+- reco2file_and_channel:双声道录音情况使用到
+- spk2gender:将说话人和其性别建立映射关系，用于声道长度归一化
+## Kaldi IO
+- [Kaldi IO][7]
+## [**HCLG.fst**][12]
+- G.fst : the language model FST
+- L.fst : maps monophone sequences to words
+- C.fst : maps triphone sequences to monophones, expands the phones into context-dependent phones
+- H.fst : maps multiple HMM states(a.k.a transition-ids in Kaldi-speak) to context-dependent triphones
 
 [1]:../../egs/yesno/README.txt
 [2]:https://sourceforge.net/p/cmusphinx/discussion/help/thread/a8cff6d9/
@@ -45,3 +60,6 @@
 [7]:https://github.com/keighrim/kaldi-yesno-tutorial
 [8]:https://blog.csdn.net/shichaog/article/details/73264152
 [9]:https://www.jianshu.com/p/9b6cc95668a9
+[10]:https://shichaog1.gitbooks.io/hand-book-of-speech-enhancement-and-recognition/content/
+[11]:http://jrmeyer.github.io/asr/2016/02/01/Kaldi-notes.html
+[12]:http://jrmeyer.github.io/asr/2016/02/01/Kaldi-notes.html
