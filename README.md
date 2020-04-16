@@ -16,6 +16,8 @@ kaldi study notes
 # open source data
 - [语音行业有什么好用的开源噪声库吗][9]
 
+# Blog
+- [On lattice free MMI and Chain models in Kaldi][10]
 
 [1]:http://www.danielpovey.com/kaldi-lectures.html
 [2]:http://jrmeyer.github.io/asr/2016/02/01/Kaldi-notes.html
@@ -26,3 +28,4 @@ kaldi study notes
 [7]:http://www.kaldi-asr.org/doc/index.html
 [8]:https://www.zhihu.com/question/362498376
 [9]:https://www.zhihu.com/question/278918708/answer/631873989
+[10]:https://desh2608.github.io/2019-05-21-chain/
