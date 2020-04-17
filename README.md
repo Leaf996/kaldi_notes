@@ -19,6 +19,26 @@ kaldi study notes
 # Blog
 - [On lattice free MMI and Chain models in Kaldi][10]
 
+# Install
+- Tools
+    - [**Atlas**][11] : a portably efficient [BLAS][12] implementation
+    - [**OpenFst**][13] : OpenFst is a library for constructing, combining, optimizing, and searching weighted finite-state transducers (FSTs).
+    - [**sctk**][14] : Speech Recognition Scoring Toolkit (SCTK)
+    - [**sph2pipe**][15] : convert SPHERE files to other formats
+    - [**cub**][16] : CUB is a flexible library of cooperative threadblock primitives and other utilities for CUDA kernel programming
+    - [**irstlm**][17] : A toolkit for language modeling
+    - [**portaudio**][18] : PortAudio is a free, cross-platform, open-source, audio I/O library
+    - [**speex**][19] : A Free Codec For Free Speech
+    - [**srilm**][20] : The SRI Language Modeling Toolkit
+    - [**kenlm**][21] : Faster and Smaller Language Model Queries
+    - [**l-bfgs**][22] : a library of Limited-memory Broyden-Fletcher-Goldfarb-Shanno (L-BFGS)
+    - [*mkl*][23] : Intel® Math Kernel Library
+
+# 填坑记
+- Windows vs. Linux
+    - link-file : windows不识别Linux下的软链接文件, 软连接会被替换成路径
+
+
 [1]:http://www.danielpovey.com/kaldi-lectures.html
 [2]:http://jrmeyer.github.io/asr/2016/02/01/Kaldi-notes.html
 [3]:https://www.dazhuanlan.com/2019/11/07/5dc428c57a2f4/
@@ -29,3 +49,16 @@ kaldi study notes
 [8]:https://www.zhihu.com/question/362498376
 [9]:https://www.zhihu.com/question/278918708/answer/631873989
 [10]:https://desh2608.github.io/2019-05-21-chain/
+[11]:http://math-atlas.sourceforge.net/
+[12]:http://www.netlib.org/blas/
+[13]:http://www.openfst.org/twiki/bin/view/FST/WebHome
+[14]:https://github.com/usnistgov/SCTK
+[15]:https://www.openslr.org/3/
+[16]:https://github.com/NVlabs/cub
+[17]:https://github.com/irstlm-team/irstlm
+[18]:http://www.portaudio.com/
+[19]:https://www.speex.org/
+[20]:http://www.speech.sri.com/projects/srilm/
+[21]:https://github.com/kpu/kenlm
+[22]:https://github.com/chokkan/liblbfgs
+[23]:https://software.intel.com/en-us/mkl
