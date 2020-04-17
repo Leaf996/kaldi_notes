@@ -50,6 +50,9 @@
 - L.fst : maps monophone sequences to words
 - C.fst : maps triphone sequences to monophones, expands the phones into context-dependent phones
 - H.fst : maps multiple HMM states(a.k.a transition-ids in Kaldi-speak) to context-dependent triphones
+## Step-by-Step
+- [**Step-by-Step**][13]
+
 
 [1]:../../egs/yesno/README.txt
 [2]:https://sourceforge.net/p/cmusphinx/discussion/help/thread/a8cff6d9/
@@ -63,3 +66,4 @@
 [10]:https://shichaog1.gitbooks.io/hand-book-of-speech-enhancement-and-recognition/content/
 [11]:http://jrmeyer.github.io/asr/2016/02/01/Kaldi-notes.html
 [12]:http://jrmeyer.github.io/asr/2016/02/01/Kaldi-notes.html
+[13]:step-by-step.md
