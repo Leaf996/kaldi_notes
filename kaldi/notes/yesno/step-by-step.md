@@ -21,8 +21,8 @@
 - **other**
     - path.sh : set enviroment variable
     - run.sh : top-level entry
-    - steps : - [ ]
-    - utils : - [ ]
+    - steps : `todo`
+    - utils : `todo`
 ## Steps
 - step-1:
 ## Questions
