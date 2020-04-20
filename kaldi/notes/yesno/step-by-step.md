@@ -27,8 +27,10 @@
 - **step-1** : download data(line 6 to 11)
 - **step-2** : prepare_data(line 20), generate wav.scp, text, utt2spk, spk2utt
     - <img src="../../images/yesno/wav_scp.png" title="wav.scp" />
-    - ![wav.scp](../../images/yesno/wav_scp.png)
-    - ![text](../../images/yesno/text.png)
-    - ![utt2spk](../../images/yesno/utt2spk.png)
+    - <img src="../../images/yesno/text.png" title="text" />
+    - <img src="../../images/yesno/utt2spk.png" title="utt2spk" />
+- **step-3** : prepare_dict, generate lexicon_words.txt, lexicon.txt, nonsilence_phones.txt, silence_phones.txt, optional_silence.txt
+    - <img src="../../images/yesno/lexicon_words.png" title="lexicon_words" />
+    - <img src="../../images/yesno/lexicon.png" title="lexicon" />
 ## Questions
 - TODO
