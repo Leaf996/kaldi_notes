@@ -26,7 +26,7 @@
 ## Steps
 - **step-1** : download data(line 6 to 11)
 - **step-2** : prepare_data(line 20), generate wav.scp, text, utt2spk, spk2utt
-    - <img src="../../images/yesno/wav_scp.png" alt="GitHub" title="wav.scp" width="50" height="50" />
+    - <img src="../../images/yesno/wav_scp.png" title="wav.scp" />
     - ![wav.scp](../../images/yesno/wav_scp.png)
     - ![text](../../images/yesno/text.png)
     - ![utt2spk](../../images/yesno/utt2spk.png)
