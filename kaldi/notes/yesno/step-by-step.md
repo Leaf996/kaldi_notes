@@ -24,6 +24,8 @@
     - steps : `todo`
     - utils : `todo`
 ## Steps
-- step-1:
+- **step-1** : download data(line 6 to 11)
+- **step-2** : prepare_data(line 20), generate wav.scp, text, utt2spk, spk2utt
+    - ![text](../../images/yesno/text.png)
 ## Questions
 - TODO
