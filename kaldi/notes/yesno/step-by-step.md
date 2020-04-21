@@ -32,5 +32,6 @@
 - **step-3** : prepare_dict, generate lexicon_words.txt, lexicon.txt, nonsilence_phones.txt, silence_phones.txt, optional_silence.txt
     - <img src="../../images/yesno/lexicon_words.png" title="lexicon_words" />
     - <img src="../../images/yesno/lexicon.png" title="lexicon" />
+- **step-4** : TODO
 ## Questions
 - TODO
