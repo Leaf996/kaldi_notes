@@ -9,6 +9,7 @@ kaldi study notes
 - [Kaldi(A4)model文件分析][4]
 - [Kaldi-notes][5]
 - [**Kaldi Tutorial**][6]
+- [**Kaldi 查看不同文件用到的命令**][24]
 
 # kaldi data augments
 - [Kaldi当中语音数据增强有什么方法][8]
@@ -62,3 +63,4 @@ kaldi study notes
 [21]:https://github.com/kpu/kenlm
 [22]:https://github.com/chokkan/liblbfgs
 [23]:https://software.intel.com/en-us/mkl
+[24]:https://blog.csdn.net/qq_25867649/article/details/78356506
