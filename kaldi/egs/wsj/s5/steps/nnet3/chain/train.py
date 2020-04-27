@@ -335,12 +335,12 @@ def train(args, run_opts):
     # we do this as it's a convenient way to get the stats for the 'lda-like'
     # transform.
     if (args.stage <= -6):
-        logger.info("Creating phone language-model")
+        logger.info("Creating phone language-model")                    # create phone_lm
         chain_lib.create_phone_lm(args.dir, args.tree_dir, run_opts,
                                   lm_opts=args.lm_opts)
 
     if (args.stage <= -5):
-        logger.info("Creating denominator FST")
+        logger.info("Creating denominator FST")                         # create den.fst
         shutil.copy('{0}/tree'.format(args.tree_dir), args.dir)
         chain_lib.create_denominator_fst(args.dir, args.tree_dir, run_opts)
 

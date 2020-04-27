@@ -15,18 +15,21 @@
 train_dir=data/local/train
 dev_dir=data/local/dev
 test_dir=data/local/test
+
 dict_dir=data/local/dict
 mkdir -p $dict_dir
 mkdir -p $dict_dir/lexicon-{en,ch}
 
+
 # extract full vocabulary
 cat $train_dir/text $dev_dir/text $test_dir/text | awk '{for (i = 2; i <= NF; i++) print $i}' |\
-  perl -ape 's/ /\n/g;' | sort -u | grep -v '\[LAUGHTER\]' | grep -v '\[NOISE\]' |\
+  perl -ape 's/ /\n/g;' | sort -u | grep -v '\[LAUGHTER\]' | grep -v '\[NOISE\]' |\               # 替换
   grep -v '\[VOCALIZED-NOISE\]' > $dict_dir/words.txt || exit 1;
 
 # split into English and Chinese
-cat $dict_dir/words.txt | grep '[a-zA-Z]' > $dict_dir/lexicon-en/words-en.txt || exit 1;
-cat $dict_dir/words.txt | grep -v '[a-zA-Z]' > $dict_dir/lexicon-ch/words-ch.txt || exit 1;
+cat $dict_dir/words.txt | grep '[a-zA-Z]'    > $dict_dir/lexicon-en/words-en.txt || exit 1;       # english
+cat $dict_dir/words.txt | grep -v '[a-zA-Z]' > $dict_dir/lexicon-ch/words-ch.txt || exit 1;       # chinese
+
 
 
 ##### produce pronunciations for english
@@ -37,7 +40,7 @@ if [ ! -f $dict_dir/cmudict/cmudict.0.7a ]; then
 fi
 
 # format cmudict
-echo "--- Striping stress and pronunciation variant markers from cmudict ..."
+echo "--- Striping <stress> and pronunciation variant markers from cmudict ..."
 perl $dict_dir/cmudict/scripts/make_baseform.pl \
   $dict_dir/cmudict/cmudict.0.7a /dev/stdout |\
   sed -e 's:^\([^\s(]\+\)([0-9]\+)\(\s\+\)\(.*\):\1\2\3:' > $dict_dir/cmudict/cmudict-plain.txt || exit 1;
@@ -59,7 +62,7 @@ wc -l $dict_dir/lexicon-en/lexicon-en-iv.txt
 if [ ! -f conf/g2p_model ]; then
   echo "--- Downloading a pre-trained Sequitur G2P model ..."
   wget http://sourceforge.net/projects/kaldi/files/sequitur-model4 -O conf/g2p_model
-  if [ ! -f conf/g2p_model ]; then
+  if [ ! -f conf/g2p_model ]; thenif [ ! -f conf/g2p_model ]; then
     echo "Failed to download the g2p model!"
     exit 1
   fi
@@ -78,15 +81,18 @@ g2p.py --model=conf/g2p_model --apply $dict_dir/lexicon-en/words-en-oov.txt \
 cat $dict_dir/lexicon-en/lexicon-en-oov.txt $dict_dir/lexicon-en/lexicon-en-iv.txt |\
   sort > $dict_dir/lexicon-en/lexicon-en-phn.txt || exit 1;
 
+
 # convert cmu phoneme to pinyin phonenme
 mkdir -p $dict_dir/map
-cat conf/cmu2pinyin | awk '{print $1;}' | sort -u > $dict_dir/map/cmu || exit 1;
+cat conf/cmu2pinyin | awk '{print $1;}' | sort -u > $dict_dir/map/cmu || exit 1;                      # 完整的cmu集合
+
 cat conf/pinyin2cmu | awk -v cmu=$dict_dir/map/cmu \
   'BEGIN{while((getline<cmu)) dict[$1] = 1;}
-   {for (i = 2; i <=NF; i++) if (dict[$i]) print $i;}' | sort -u > $dict_dir/map/cmu-used || exit 1;
+   {for (i = 2; i <=NF; i++) if (dict[$i]) print $i;}' | sort -u > $dict_dir/map/cmu-used || exit 1;  # 拼音对应的cmu集合，仅包含部分cmu音素
+
 cat $dict_dir/map/cmu | awk -v cmu=$dict_dir/map/cmu-used \
   'BEGIN{while((getline<cmu)) dict[$1] = 1;}
-   {if (!dict[$1]) print $1;}' > $dict_dir/map/cmu-not-used || exit 1;
+   {if (!dict[$1]) print $1;}' > $dict_dir/map/cmu-not-used || exit 1;                                # 拼音对应的cmu集合的补集， cmu-used + cmu-not-used = cmu
 
 awk 'NR==FNR{words[$1]; next;} ($1 in words)' \
   $dict_dir/map/cmu-not-used conf/cmu2pinyin |\
@@ -98,8 +104,8 @@ cat $dict_dir/map/cmu-py | \
   my %py2ph;
   foreach $line (<MAPS>) {
     @A = split(" ", $line);
-    $py = shift(@A);
-    $py2ph{$py} = [@A];
+    $py = shift(@A);            # shift, pinyin
+    $py2ph{$py} = [@A];         # cmu
   }
   my @entry;
   while (<STDIN>) {

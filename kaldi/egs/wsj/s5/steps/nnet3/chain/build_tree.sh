@@ -126,11 +126,13 @@ if [ -z $alignment_subsampling_factor ]; then
   alignment_subsampling_factor=$frame_subsampling_factor
 fi
 
+
 if [ $stage -le -5 ]; then
   echo "$0: Initializing monophone model (for alignment conversion, in case topology changed)"
 
   [ ! -f $lang/phones/sets.int ] && exit 1;
-  shared_phones_opt="--shared-phones=$lang/phones/sets.int"
+  shared_phones_opt="--shared-phones=$lang/phones/sets.int"   # How dose sets.int work, mono-phone training stage ?
+
   # get feature dimension
   example_feats="`echo $feats | sed s/JOB/1/g`";
   if ! feat_dim=$(feat-to-dim "$example_feats" - 2>/dev/null) || [ -z $feat_dim ]; then
@@ -138,10 +140,12 @@ if [ $stage -le -5 ]; then
     echo "error getting feature dimension"
     exit 1;
   fi
+
   $cmd JOB=1 $dir/log/init_mono.log \
     gmm-init-mono $shared_phones_opt "--train-feats=$feats subset-feats --n=10 ark:- ark:-|" $lang/topo $feat_dim \
       $dir/mono.mdl $dir/mono.tree || exit 1;
 fi
+
 
 if [ $stage -le -4 ]; then
   # Get tree stats.
@@ -151,11 +155,14 @@ if [ $stage -le -4 ]; then
          $alidir/final.mdl $dir/mono.mdl $dir/mono.tree "ark:gunzip -c $alidir/ali.JOB.gz|" ark:-  \| \
       acc-tree-stats $context_opts $tree_stats_opts --ci-phones=$ciphonelist $dir/mono.mdl \
          "$feats" ark:- $dir/JOB.treeacc || exit 1;
+
   [ "`ls $dir/*.treeacc | wc -w`" -ne "$nj" ] && echo "$0: Wrong #tree-accs" && exit 1;
+
   $cmd $dir/log/sum_tree_acc.log \
     sum-tree-stats $dir/treeacc $dir/*.treeacc || exit 1;
   rm $dir/*.treeacc
 fi
+
 
 if [ $stage -le -3 ] && $train_tree; then
   echo "$0: Getting questions for tree clustering."
@@ -163,7 +170,9 @@ if [ $stage -le -3 ] && $train_tree; then
   $cmd $dir/log/questions.log \
      cluster-phones $cluster_phones_opts $context_opts $dir/treeacc \
      $lang/phones/sets.int $dir/questions.int || exit 1;
+
   cat $lang/phones/extra_questions.int >> $dir/questions.int
+
   $cmd $dir/log/compile_questions.log \
     compile-questions $context_opts $lang/topo \
       $dir/questions.int $dir/questions.qst || exit 1;
@@ -175,13 +184,16 @@ if [ $stage -le -3 ] && $train_tree; then
     $dir/questions.qst $lang/topo $dir/tree || exit 1;
 fi
 
+
 if [ $stage -le -2 ]; then
   echo "$0: Initializing the model"
   gmm-init-model  --write-occs=$dir/1.occs  \
     $dir/tree $dir/treeacc $lang/topo $dir/1.mdl 2> $dir/log/init_model.log || exit 1;
+
   grep 'no stats' $dir/log/init_model.log && echo "This is a bad warning.";
   rm $dir/treeacc
 fi
+
 
 if [ $stage -le -1 ]; then
   # Convert the alignments to the new tree.  Note: we likely will not use these
