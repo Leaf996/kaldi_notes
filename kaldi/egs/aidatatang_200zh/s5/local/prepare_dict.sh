@@ -156,7 +156,7 @@ cat $dict_dir/cedict/cedict_1_0_ts_utf-8_mdbg.txt | grep -v '#' | awk -F '/' '{p
  perl -e '
   while (<STDIN>) {
     @A = split(" ", $_);
-    print $A[1];
+    print $A[1];                                      # 中文简体
     for($n = 2; $n < @A; $n++) {
       $A[$n] =~ s:\[?([a-zA-Z0-9\:]+)\]?:$1:;
       $tmp = uc($A[$n]);
@@ -179,7 +179,7 @@ wc -l $dict_dir/lexicon-ch/words-ch-oov.txt
 wc -l $dict_dir/lexicon-ch/lexicon-ch-iv.txt
 
 
-# validate Chinese dictionary and compose a char-based
+# validate Chinese dictionary and compose a char-based        # 一个字对应一个发音
 # dictionary in order to get OOV pronunciations
 cat $dict_dir/cedict/ch-dict.txt |\
   perl -e '
@@ -215,7 +215,7 @@ cat $dict_dir/cedict/ch-dict-1.txt |\
   perl -ape 's/ /\n/g;' > $dict_dir/lexicon-ch/ch-char-pinyin.txt || exit 1;
 
 # first make sure number of characters and pinyins
-# are equal, so that a char-based dictionary can
+# are equal, so that a char-based dictionary can                # char-based ： 字符based/汉字based, 多音字如何处理?
 # be composed.
 nchars=`wc -l < $dict_dir/lexicon-ch/ch-char.txt`
 npinyin=`wc -l < $dict_dir/lexicon-ch/ch-char-pinyin.txt`
@@ -227,7 +227,7 @@ fi
 paste $dict_dir/lexicon-ch/ch-char.txt $dict_dir/lexicon-ch/ch-char-pinyin.txt |\
   sort -u > $dict_dir/lexicon-ch/ch-char-dict.txt || exit 1;
 
-# create a multiple pronunciation dictionary
+# create a multiple pronunciation dictionary                    # 多音字
 cat $dict_dir/lexicon-ch/ch-char-dict.txt |\
   perl -e '
   my $prev = "";
@@ -238,8 +238,8 @@ cat $dict_dir/lexicon-ch/ch-char-dict.txt |\
     $cur_py = $A[1];
     #print length($prev);
     if (length($prev) == 0) { $out_line = $_; chomp($out_line);}
-    if (length($prev)>0 && $cur ne $prev) { print $out_line; print "\n"; $out_line = $_; chomp($out_line);}
-    if (length($prev)>0 && $cur eq $prev) { $out_line = $out_line."/"."$cur_py";}
+    if (length($prev) > 0 && $cur ne $prev) { print $out_line; print "\n"; $out_line = $_; chomp($out_line);}
+    if (length($prev) > 0 && $cur eq $prev) { $out_line = $out_line."/"."$cur_py";}   # string concanate
     $prev = $cur;
   }
   print $out_line;
@@ -248,6 +248,7 @@ cat $dict_dir/lexicon-ch/ch-char-dict.txt |\
 # get lexicon for Chinese OOV words
 local/create_oov_char_lexicon.pl $dict_dir/lexicon-ch/ch-char-dict-mp.txt \
   $dict_dir/lexicon-ch/words-ch-oov.txt > $dict_dir/lexicon-ch/lexicon-ch-oov.txt || exit 1;
+
 
 # seperate multiple prons for Chinese OOV lexicon
 cat $dict_dir/lexicon-ch/lexicon-ch-oov.txt |\
@@ -280,6 +281,7 @@ cat $dict_dir/lexicon-ch/lexicon-ch-oov.txt |\
 cat $dict_dir/lexicon-ch/lexicon-ch-oov-mp.txt $dict_dir/lexicon-ch/lexicon-ch-iv.txt |\
   awk '{if (NF > 1 && $2 ~ /[A-Za-z0-9]+/) print $0;}' > $dict_dir/lexicon-ch/lexicon-ch.txt || exit 1;
 
+
 # convert Chinese pinyin to CMU format
 cat $dict_dir/lexicon-ch/lexicon-ch.txt | sed -e 's/U:/V/g' | sed -e 's/ R\([0-9]\)/ ER\1/g'|\
   utils/pinyin_map.pl conf/pinyin2cmu > $dict_dir/lexicon-ch/lexicon-ch-cmu.txt || exit 1;
@@ -287,6 +289,7 @@ cat $dict_dir/lexicon-ch/lexicon-ch.txt | sed -e 's/U:/V/g' | sed -e 's/ R\([0-9
 # combine English and Chinese lexicons
 cat $dict_dir/lexicon-en/lexicon-en.txt $dict_dir/lexicon-ch/lexicon-ch-cmu.txt |\
   sort -u > $dict_dir/lexicon1.txt || exit 1;
+
 
 cat $dict_dir/lexicon1.txt | awk '{ for(n=2;n<=NF;n++){ phones[$n] = 1; }} END{for (p in phones) print p;}'| \
   sort -u |\
@@ -297,7 +300,7 @@ cat $dict_dir/lexicon1.txt | awk '{ for(n=2;n<=NF;n++){ phones[$n] = 1; }} END{f
     chomp($phone);
     chomp($_);
     $phone =~ s:([A-Z]+)[0-9]:$1:;
-    if (exists $ph_cl{$phone}) { push(@{$ph_cl{$phone}}, $_)  }
+    if (exists $ph_cl{$phone}) { push(@{$ph_cl{$phone}}, $_)  }     # 不同的stress
     else { $ph_cl{$phone} = [$_]; }
   }
   foreach $key ( keys %ph_cl ) {
