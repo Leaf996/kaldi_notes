@@ -31,7 +31,7 @@ local/download_and_untar.sh $data $data_url aidatatang_200zh || exit 1;
 local/data_prep.sh $data/aidatatang_200zh/corpus $data/aidatatang_200zh/transcript || exit 1;
 
 # Lexicon Preparation: build a large lexicon that invovles words in both the training and decoding
-local/prepare_dict.sh || exit 1;
+local/prepare_dict.sh || exit 1;  # word-phone map
 
 # Prepare Language Stuff
 # Phone Sets, questions, L compilation

@@ -19,6 +19,8 @@ kaldi study notes
 
 # Blog
 - [On lattice free MMI and Chain models in Kaldi][10]
+- [position-dependent-phones][25]
+- [shared, split][26]
 
 # Install
 - Tools
@@ -64,3 +66,5 @@ kaldi study notes
 [22]:https://github.com/chokkan/liblbfgs
 [23]:https://software.intel.com/en-us/mkl
 [24]:https://blog.csdn.net/qq_25867649/article/details/78356506
+[25]:https://kaldi-asr.org/doc/data_prep.html
+[26]:https://kaldi-asr.org/doc/tree_externals.html

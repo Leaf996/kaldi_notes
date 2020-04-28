@@ -103,7 +103,7 @@ sub check_allowed_whitespace {
 
 
 if(@ARGV != 1) {
-  die "Usage: validate_dict_dir.pl <dict-dir>\n" .
+  die "Usage: validate_dict_dir.pl <dict-dir>\n".
       "e.g.: validate_dict_dir.pl data/local/dict\n";
 }
 
