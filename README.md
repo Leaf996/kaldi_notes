@@ -16,6 +16,7 @@ kaldi study notes
 
 # open source data
 - [语音行业有什么好用的开源噪声库吗][9]
+- [Speaker dependent alignemnt][27]
 
 # Blog
 - [On lattice free MMI and Chain models in Kaldi][10]
@@ -40,6 +41,8 @@ kaldi study notes
 # 填坑记
 - Windows vs. Linux
     - link-file : windows不识别Linux下的软链接文件, 软连接会被替换成路径
+- ark,s,cs:
+    - [Kaldi I/O from a command-line perspective][28]
 
 
 [1]:http://www.danielpovey.com/kaldi-lectures.html
@@ -68,3 +71,5 @@ kaldi study notes
 [24]:https://blog.csdn.net/qq_25867649/article/details/78356506
 [25]:https://kaldi-asr.org/doc/data_prep.html
 [26]:https://kaldi-asr.org/doc/tree_externals.html
+[27]:https://groups.google.com/forum/#!topic/kaldi-help/rUbllogHopA
+[28]:https://kaldi-asr.org/doc/io_tut.html

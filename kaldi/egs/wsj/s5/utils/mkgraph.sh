@@ -3,10 +3,10 @@
 #           2012-2013 Johns Hopkins University (Author: Daniel Povey)
 # Apache 2.0
 
-# This script creates a fully expanded decoding graph (HCLG) that represents
+# This script creates a fully expanded decoding graph (HCLG) that represents        # HCLG
 # all the language-model, pronunciation dictionary (lexicon), context-dependency,
 # and HMM structure in our model.  The output is a Finite State Transducer
-# that has word-ids on the output, and pdf-ids on the input (these are indexes
+# that has word-ids on the output, and pdf-ids on the input (these are indexes      # word-id output, pdf-id input
 # that resolve to Gaussian Mixture Models).
 # See
 #  http://kaldi-asr.org/doc/graph_recipe_test.html
@@ -21,12 +21,14 @@ loopscale=0.1
 remove_oov=false
 
 for x in `seq 4`; do
+  # https://stackoverflow.com/questions/4223294/using-or-in-shell-script
   [ "$1" == "--mono" -o "$1" == "--left-biphone" -o "$1" == "--quinphone" ] && shift && \
     echo "WARNING: the --mono, --left-biphone and --quinphone options are now deprecated and ignored."
   [ "$1" == "--remove-oov" ] && remove_oov=true && shift;
   [ "$1" == "--transition-scale" ] && tscale=$2 && shift 2;
   [ "$1" == "--self-loop-scale" ] && loopscale=$2 && shift 2;
 done
+
 
 if [ $# != 3 ]; then
    echo "Usage: utils/mkgraph.sh [options] <lang-dir> <model-dir> <graphdir>"
@@ -59,11 +61,12 @@ for f in $required; do
   [ ! -f $f ] && echo "mkgraph.sh: expected $f to exist" && exit 1;
 done
 
+
 if [ -f $dir/HCLG.fst ]; then
   # detect when the result already exists, and avoid overwriting it.
   must_rebuild=false
   for f in $required; do
-    [ $f -nt $dir/HCLG.fst ] && must_rebuild=true
+    [ $f -nt $dir/HCLG.fst ] && must_rebuild=true   # -nt : new than
   done
   if ! $must_rebuild; then
     echo "$0: $dir/HCLG.fst is up to date."
@@ -75,8 +78,10 @@ fi
 N=$(tree-info $tree | grep "context-width" | cut -d' ' -f2) || { echo "Error when getting context-width"; exit 1; }
 P=$(tree-info $tree | grep "central-position" | cut -d' ' -f2) || { echo "Error when getting central-position"; exit 1; }
 
+
 [[ -f $2/frame_subsampling_factor && "$loopscale" == "0.1" ]] && \
   echo "$0: WARNING: chain models need '--self-loop-scale 1.0'";
+
 
 if [ -f $lang/phones/nonterm_phones_offset.int ]; then
   if [[ $N != 2  || $P != 1 ]]; then
@@ -91,6 +96,7 @@ else
   nonterm_opt=
 fi
 
+
 mkdir -p $lang/tmp
 trap "rm -f $lang/tmp/LG.fst.$$" EXIT HUP INT PIPE TERM
 # Note: [[ ]] is like [ ] but enables certain extra constructs, e.g. || in
@@ -102,6 +108,7 @@ if [[ ! -s $lang/tmp/LG.fst || $lang/tmp/LG.fst -ot $lang/G.fst || \
   mv $lang/tmp/LG.fst.$$ $lang/tmp/LG.fst
   fstisstochastic $lang/tmp/LG.fst || echo "[info]: LG not stochastic."
 fi
+
 
 clg=$lang/tmp/CLG_${N}_${P}.fst
 clg_tmp=$clg.$$
@@ -119,6 +126,7 @@ if [[ ! -s $clg || $clg -ot $lang/tmp/LG.fst \
   mv $ilabels_tmp $ilabels
   fstisstochastic $clg || echo "[info]: CLG not stochastic."
 fi
+
 
 trap "rm -f $dir/Ha.fst.$$" EXIT HUP INT PIPE TERM
 if [[ ! -s $dir/Ha.fst || $dir/Ha.fst -ot $model  \
@@ -172,10 +180,10 @@ rm $dir/HCLGa.fst $dir/Ha.fst 2>/dev/null || true
 
 cp $lang/words.txt $dir/ || exit 1;
 mkdir -p $dir/phones
-cp $lang/phones/word_boundary.* $dir/phones/ 2>/dev/null # might be needed for ctm scoring,
-cp $lang/phones/align_lexicon.* $dir/phones/ 2>/dev/null # might be needed for ctm scoring,
+cp $lang/phones/word_boundary.* $dir/phones/ 2>/dev/null    # might be needed for ctm scoring,
+cp $lang/phones/align_lexicon.* $dir/phones/ 2>/dev/null    # might be needed for ctm scoring,
 cp $lang/phones/optional_silence.* $dir/phones/ 2>/dev/null # might be needed for analyzing alignments.
-    # but ignore the error if it's not there.
+                                                            # but ignore the error if it's not there.
 
 
 cp $lang/phones/disambig.{txt,int} $dir/phones/ 2> /dev/null

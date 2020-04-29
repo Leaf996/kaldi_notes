@@ -5,29 +5,31 @@
 
 
 # To be run from ..
-# Flat start and monophone training, with delta-delta features.
-# This script applies cepstral mean normalization (per speaker).
+# Flat start and monophone training, with delta-delta features.   # flat-start, delta-delta features
+# This script applies cepstral mean normalization (per speaker).  # per speaker cmvn
+
 
 # Begin configuration section.
 nj=4
 cmd=run.pl
 scale_opts="--transition-scale=1.0 --acoustic-scale=0.1 --self-loop-scale=0.1"
-num_iters=40    # Number of iterations of training
-max_iter_inc=30 # Last iter to increase #Gauss on.
-initial_beam=6  # beam used in the first iteration (set smaller to speed up initialization)
-regular_beam=10 # beam used after the first iteration
+num_iters=40      # Number of iterations of training
+max_iter_inc=30   # Last iter to increase #Gauss on.
+initial_beam=6    # beam used in the first iteration (set smaller to speed up initialization)
+regular_beam=10   # beam used after the first iteration
 retry_beam=40
-totgauss=1000   # Target #Gaussians.
+totgauss=1000     # Target #Gaussians.
 careful=false
 boost_silence=1.0 # Factor by which to boost silence likelihoods in alignment
 realign_iters="1 2 3 4 5 6 7 8 9 10 12 14 16 18 20 23 26 29 32 35 38";
-config= # name of config file.
+config=           # name of config file.
 stage=-4
-power=0.25 # exponent to determine number of gaussians from occurrence counts
-norm_vars=false # deprecated, prefer --cmvn-opts "--norm-vars=false"
-cmvn_opts=  # can be used to add extra options to cmvn.
-delta_opts= # can be used to add extra options to add-deltas
+power=0.25        # exponent to determine number of gaussians from occurrence counts
+norm_vars=false   # deprecated, prefer --cmvn-opts "--norm-vars=false"
+cmvn_opts=        # can be used to add extra options to cmvn.
+delta_opts=       # can be used to add extra options to add-deltas
 # End configuration section.
+
 
 echo "$0 $@"  # Print the command line for logging
 
@@ -44,30 +46,35 @@ if [ $# != 3 ]; then
   exit 1;
 fi
 
+
 data=$1
 lang=$2
 dir=$3
+
 
 oov_sym=`cat $lang/oov.int` || exit 1;
 
 mkdir -p $dir/log
 echo $nj > $dir/num_jobs
 sdata=$data/split$nj;
-[[ -d $sdata && $data/feats.scp -ot $sdata ]] || split_data.sh $data $nj || exit 1;
+[[ -d $sdata && $data/feats.scp -ot $sdata ]] || split_data.sh $data $nj || exit 1;   # -ot : older than
 
 cp $lang/phones.txt $dir || exit 1;
 
 $norm_vars && cmvn_opts="--norm-vars=true $cmvn_opts"
-echo $cmvn_opts  > $dir/cmvn_opts # keep track of options to CMVN.
-[ ! -z $delta_opts ] && echo $delta_opts > $dir/delta_opts # keep track of options to delta
+echo $cmvn_opts  > $dir/cmvn_opts                           # keep track of options to CMVN.
+[ ! -z $delta_opts ] && echo $delta_opts > $dir/delta_opts  # keep track of options to delta
 
 feats="ark,s,cs:apply-cmvn $cmvn_opts --utt2spk=ark:$sdata/JOB/utt2spk scp:$sdata/JOB/cmvn.scp scp:$sdata/JOB/feats.scp ark:- | add-deltas $delta_opts ark:- ark:- |"
 example_feats="`echo $feats | sed s/JOB/1/g`";
 
+
 echo "$0: Initializing monophone system."
+
 
 [ ! -f $lang/phones/sets.int ] && exit 1;
 shared_phones_opt="--shared-phones=$lang/phones/sets.int"
+
 
 if [ $stage -le -3 ]; then
   # Note: JOB=1 just uses the 1st part of the features-- we only need a subset anyway.
@@ -81,16 +88,19 @@ if [ $stage -le -3 ]; then
     $dir/0.mdl $dir/tree || exit 1;
 fi
 
+
 numgauss=`gmm-info --print-args=false $dir/0.mdl | grep gaussians | awk '{print $NF}'`
-incgauss=$[($totgauss-$numgauss)/$max_iter_inc] # per-iter increment for #Gauss
+incgauss=$[($totgauss-$numgauss)/$max_iter_inc]   # per-iter increment for #Gauss
+
 
 if [ $stage -le -2 ]; then
   echo "$0: Compiling training graphs"
   $cmd JOB=1:$nj $dir/log/compile_graphs.JOB.log \
-    compile-train-graphs --read-disambig-syms=$lang/phones/disambig.int $dir/tree $dir/0.mdl  $lang/L.fst \
+    compile-train-graphs --read-disambig-syms=$lang/phones/disambig.int $dir/tree $dir/0.mdl $lang/L.fst \
     "ark:sym2int.pl --map-oov $oov_sym -f 2- $lang/words.txt < $sdata/JOB/text|" \
     "ark:|gzip -c >$dir/fsts.JOB.gz" || exit 1;
 fi
+
 
 if [ $stage -le -1 ]; then
   echo "$0: Aligning data equally (pass 0)"
@@ -108,6 +118,7 @@ if [ $stage -le 0 ]; then
     $dir/0.mdl "gmm-sum-accs - $dir/0.*.acc|" $dir/1.mdl 2> $dir/log/update.0.log || exit 1;
   rm $dir/0.*.acc
 fi
+
 
 beam=$initial_beam # will change to regular_beam below after 1st pass
 # note: using slightly wider beams for WSJ vs. RM.

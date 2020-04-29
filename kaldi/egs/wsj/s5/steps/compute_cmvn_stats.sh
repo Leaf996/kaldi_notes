@@ -5,13 +5,13 @@
 # To be run from .. (one directory up from here)
 # see ../run.sh for example
 
-# Compute cepstral mean and variance statistics per speaker.
+# Compute cepstral mean and variance statistics per speaker.        # 基于speaker的cmvn
 # We do this in just one job; it's fast.
 # This script takes no options.
 #
-# Note: there is no option to do CMVN per utterance.  The idea is
+# Note: there is no option to do CMVN per utterance.  The idea is   # 不支持基于utterance的cmvn
 # that if you did it per utterance it would not make sense to do
-# per-speaker fMLLR on top of that (since you'd be doing fMLLR on
+# per-speaker fMLLR on top of that (since you'd be doing fMLLR on   # fMMLR
 # top of different offsets).  Therefore what would be the use
 # of the speaker information?  In this case you should probably
 # make the speaker-ids identical to the utterance-ids.  The
@@ -24,6 +24,7 @@ fake=false   # If specified, can generate fake/dummy CMVN stats (that won't norm
 fake_dims=   # as the "fake" option, but you can generate "fake" stats only for certain
              # dimensions.
 two_channel=false
+
 
 if [ "$1" == "--fake" ]; then
   fake=true
@@ -39,7 +40,8 @@ if [ "$1" == "--two-channel" ]; then
   shift
 fi
 
-if [ $# -lt 1 ] || [ $# -gt 3 ]; then
+
+if [ $# -lt 1 ] || [ $# -gt 3 ]; then           # $# -> number of parameters
    echo "Usage: $0 [options] <data-dir> [<log-dir> [<cmvn-dir>] ]";
    echo "e.g.: $0 data/train exp/make_mfcc/train mfcc"
    echo "Note: <log-dir> defaults to <data-dir>/log, and <cmvn-dir> defaults to <data-dir>/data"
@@ -53,7 +55,9 @@ if [ $# -lt 1 ] || [ $# -gt 3 ]; then
    exit 1;
 fi
 
+
 if [ -f path.sh ]; then . ./path.sh; fi
+
 
 data=$1
 if [ $# -ge 2 ]; then
@@ -66,6 +70,7 @@ if [ $# -ge 3 ]; then
 else
   cmvndir=$data/data
 fi
+
 
 # make $cmvndir an absolute pathname.
 cmvndir=`perl -e '($dir,$pwd)= @ARGV; if($dir!~m:^/:) { $dir = "$pwd/$dir"; } print $dir; ' $cmvndir ${PWD}`
@@ -85,6 +90,7 @@ for f in $required; do
     exit 1;
   fi
 done
+
 
 if $fake; then
   dim=`feat-to-dim scp:$data/feats.scp -`

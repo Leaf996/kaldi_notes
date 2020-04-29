@@ -17,7 +17,7 @@ if [ $# != 1 ]; then
   echo "Usage: utils/data/fix_data_dir.sh <data-dir>"
   echo "e.g.: utils/data/fix_data_dir.sh data/train"
   echo "This script helps ensure that the various files in a data directory"
-  echo "are correctly sorted and filtered, for example removing utterances"
+  echo "are correctly sorted and filtered, for example removing utterances"   # 删除没有特征的语音
   echo "that have no features (if feats.scp is present)"
   exit 1
 fi
@@ -26,7 +26,7 @@ data=$1
 
 if [ -f $data/images.scp ]; then
   image/fix_data_dir.sh $cmd
-  exit $?
+  exit $?                           #  显示最后命令的退出状态。0表示没有错误，其他任何值表明有错误。
 fi
 
 mkdir -p $data/.backup
@@ -35,18 +35,19 @@ mkdir -p $data/.backup
 
 [ ! -f $data/utt2spk ] && echo "$0: no such file $data/utt2spk" && exit 1;
 
-set -e -o pipefail -u
+set -e -o pipefail -u               # 快速失败并检查退出状态(exit codes)
 
-tmpdir=$(mktemp -d /tmp/kaldi.XXXX);
+tmpdir=$(mktemp -d /tmp/kaldi.XXXX);# 创建temporary文件或目录，返回名字
 # receive 'EXIT HUP INT PIPE TERM' execute "'rm -rf "$tmpdir"'"
 trap 'rm -rf "$tmpdir"' EXIT HUP INT PIPE TERM
 
 export LC_ALL=C
 
+
 function check_sorted {
   file=$1
-  sort -k1,1 -u <$file >$file.tmp
-  if ! cmp -s $file $file.tmp; then
+  sort -k1,1 -u <$file >$file.tmp     # -k1,1 : start from f1, end at f1
+  if ! cmp -s $file $file.tmp; then   # -s : silent, suppress all normal output
     echo "$0: file $1 is not in sorted order or not unique, sorting it"
     mv $file.tmp $file
   else
