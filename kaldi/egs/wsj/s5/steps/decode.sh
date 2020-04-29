@@ -14,8 +14,8 @@ cmd=run.pl
 max_active=7000
 beam=13.0
 lattice_beam=6.0
-acwt=0.083333 # note: only really affects pruning (scoring is on lattices).
-num_threads=1 # if >1, will use gmm-latgen-faster-parallel
+acwt=0.083333   # note: only really affects pruning (scoring is on lattices).
+num_threads=1   # if >1, will use gmm-latgen-faster-parallel
 parallel_opts=  # ignored now.
 scoring_opts=
 # note: there are no more min-lmwt and max-lmwt options, instead use
@@ -23,6 +23,7 @@ scoring_opts=
 skip_scoring=false
 decode_extra_opts=
 # End configuration section.
+
 
 echo "$0 $@"  # Print the command line for logging
 
@@ -83,8 +84,10 @@ for f in $sdata/1/feats.scp $sdata/1/cmvn.scp $model $graphdir/HCLG.fst; do
   [ ! -f $f ] && echo "$0: Error: no such file $f" && exit 1;
 done
 
+
 if [ -f $srcdir/final.mat ]; then feat_type=lda; else feat_type=delta; fi
 echo "decode.sh: feature type is $feat_type";
+
 
 splice_opts=`cat $srcdir/splice_opts 2>/dev/null` # frame-splicing options.
 cmvn_opts=`cat $srcdir/cmvn_opts 2>/dev/null`
@@ -93,11 +96,14 @@ delta_opts=`cat $srcdir/delta_opts 2>/dev/null`
 thread_string=
 [ $num_threads -gt 1 ] && thread_string="-parallel --num-threads=$num_threads"
 
+
 case $feat_type in
   delta) feats="ark,s,cs:apply-cmvn $cmvn_opts --utt2spk=ark:$sdata/JOB/utt2spk scp:$sdata/JOB/cmvn.scp scp:$sdata/JOB/feats.scp ark:- | add-deltas $delta_opts ark:- ark:- |";;
   lda) feats="ark,s,cs:apply-cmvn $cmvn_opts --utt2spk=ark:$sdata/JOB/utt2spk scp:$sdata/JOB/cmvn.scp scp:$sdata/JOB/feats.scp ark:- | splice-feats $splice_opts ark:- ark:- | transform-feats $srcdir/final.mat ark:- ark:- |";;
   *) echo "$0: Error: Invalid feature type $feat_type" && exit 1;
 esac
+
+
 if [ ! -z "$transform_dir" ]; then # add transforms to features...
   echo "Using fMLLR transforms from $transform_dir"
   [ ! -f $transform_dir/trans.1 ] && echo "Expected $transform_dir/trans.1 to exist."
@@ -116,6 +122,7 @@ if [ ! -z "$transform_dir" ]; then # add transforms to features...
   fi
 fi
 
+
 if [ $stage -le 0 ]; then
   if [ -f "$graphdir/num_pdfs" ]; then
     [ "`cat $graphdir/num_pdfs`" -eq `am-info --print-args=false $model | grep pdfs | awk '{print $NF}'` ] || \
@@ -127,10 +134,12 @@ if [ $stage -le 0 ]; then
     $model $graphdir/HCLG.fst "$feats" "ark:|gzip -c > $dir/lat.JOB.gz" || exit 1;
 fi
 
+
 if [ $stage -le 1 ]; then
   [ ! -z $iter ] && iter_opt="--iter $iter"
   steps/diagnostic/analyze_lats.sh --cmd "$cmd" $iter_opt $graphdir $dir
 fi
+
 
 if ! $skip_scoring ; then
   [ ! -x local/score.sh ] && \

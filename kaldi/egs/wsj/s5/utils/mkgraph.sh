@@ -188,6 +188,6 @@ cp $lang/phones/optional_silence.* $dir/phones/ 2>/dev/null # might be needed fo
 
 cp $lang/phones/disambig.{txt,int} $dir/phones/ 2> /dev/null
 cp $lang/phones/silence.csl $dir/phones/ || exit 1;
-cp $lang/phones.txt $dir/ 2> /dev/null # ignore the error if it's not there.
+cp $lang/phones.txt $dir/ 2> /dev/null                      # ignore the error if it's not there.
 
 am-info --print-args=false $model | grep pdfs | awk '{print $NF}' > $dir/num_pdfs

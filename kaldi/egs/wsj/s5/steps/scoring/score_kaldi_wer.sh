@@ -117,7 +117,7 @@ if [ $stage -le 1 ]; then
   if $stats; then
     mkdir -p $dir/scoring_kaldi/wer_details
     echo $best_lmwt > $dir/scoring_kaldi/wer_details/lmwt # record best language model weight
-    echo $best_wip > $dir/scoring_kaldi/wer_details/wip # record best word insertion penalty
+    echo $best_wip > $dir/scoring_kaldi/wer_details/wip   # record best word insertion penalty
 
     $cmd $dir/scoring_kaldi/log/stats1.log \
       cat $dir/scoring_kaldi/penalty_$best_wip/$best_lmwt.txt \| \
