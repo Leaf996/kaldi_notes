@@ -21,15 +21,15 @@ scale_opts="--transition-scale=1.0 --acoustic-scale=0.1 --self-loop-scale=0.1"
 beam=10
 retry_beam=40
 careful=false
-boost_silence=1.0 # Factor by which to boost silence likelihoods in alignment
-context_opts=  # e.g. set this to "--context-width 5 --central-position 2" for quinphone.
+boost_silence=1.0   # Factor by which to boost silence likelihoods in alignment
+context_opts=       # e.g. set this to "--context-width 5 --central-position 2" for quinphone.
 realign_iters="10 20 30";
 fmllr_iters="2 4 6 12";
-silence_weight=0.0 # Weight on silence in fMLLR estimation.
-num_iters=35   # Number of iterations of training
-max_iter_inc=25 # Last iter to increase #Gauss on.
-power=0.2 # Exponent for number of gaussians according to occurrence counts
-cluster_thresh=-1  # for build-tree control final bottom-up clustering of leaves
+silence_weight=0.0  # Weight on silence in fMLLR estimation.
+num_iters=35        # Number of iterations of training
+max_iter_inc=25     # Last iter to increase #Gauss on.
+power=0.2           # Exponent for number of gaussians according to occurrence counts
+cluster_thresh=-1   # for build-tree control final bottom-up clustering of leaves
 phone_map=
 train_tree=true
 tree_stats_opts=
@@ -77,9 +77,9 @@ phone_map_opt=
 [ ! -z "$phone_map" ] && phone_map_opt="--phone-map='$phone_map'"
 
 mkdir -p $dir/log
-cp $alidir/splice_opts $dir 2>/dev/null # frame-splicing options.
-cp $alidir/cmvn_opts $dir 2>/dev/null # cmn/cmvn option.
-cp $alidir/delta_opts $dir 2>/dev/null # delta option.
+cp $alidir/splice_opts $dir 2>/dev/null   # frame-splicing options.
+cp $alidir/cmvn_opts $dir 2>/dev/null     # cmn/cmvn option.
+cp $alidir/delta_opts $dir 2>/dev/null    # delta option.
 
 utils/lang/check_phones_compatible.sh $lang/phones.txt $alidir/phones.txt || exit 1;
 cp $lang/phones.txt $dir || exit 1;
@@ -88,9 +88,13 @@ echo $nj >$dir/num_jobs
 [[ -d $sdata && $data/feats.scp -ot $sdata ]] || split_data.sh $data $nj || exit 1;
 
 # Set up features.
-
-if [ -f $alidir/final.mat ]; then feat_type=lda; else feat_type=delta; fi
+if [ -f $alidir/final.mat ]; then
+  feat_type=lda;
+else
+  feat_type=delta;
+fi
 echo "$0: feature type is $feat_type"
+
 
 ## Set up speaker-independent features.
 case $feat_type in
@@ -101,6 +105,7 @@ case $feat_type in
     ;;
   *) echo "$0: invalid feature type $feat_type" && exit 1;
 esac
+
 
 ## Get initial fMLLR transforms (possibly from alignment dir)
 if [ -f $alidir/trans.1 ]; then
@@ -114,6 +119,7 @@ else
     # old $lang dir which would require another option.  Not needed anyway.
     [ ! -z "$phone_map" ] && \
        echo "$0: error: you must provide transforms if you use the --phone-map option." && exit 1;
+
     $cmd JOB=1:$nj $dir/log/fmllr.0.JOB.log \
       ali-to-post "ark:gunzip -c $alidir/ali.JOB.gz|" ark:- \| \
       weight-silence-post $silence_weight $silphonelist $alidir/final.mdl ark:- ark:- \| \
@@ -124,6 +130,7 @@ else
   feats="$sifeats transform-feats --utt2spk=ark:$sdata/JOB/utt2spk ark,s,cs:$dir/trans.JOB ark:- ark:- |"
   cur_trans_dir=$dir
 fi
+
 
 if [ $stage -le -4 ] && $train_tree; then
   # Get tree stats.
@@ -136,6 +143,7 @@ if [ $stage -le -4 ] && $train_tree; then
     sum-tree-stats $dir/treeacc $dir/*.treeacc || exit 1;
   rm $dir/*.treeacc
 fi
+
 
 if [ $stage -le -3 ] && $train_tree; then
   echo "$0: Getting questions for tree clustering."
@@ -150,6 +158,7 @@ if [ $stage -le -3 ] && $train_tree; then
     --cluster-thresh=$cluster_thresh $dir/treeacc $lang/phones/roots.int \
     $dir/questions.qst $lang/topo $dir/tree || exit 1;
 fi
+
 
 if [ $stage -le -2 ]; then
   echo "$0: Initializing the model"
@@ -166,6 +175,7 @@ if [ $stage -le -2 ]; then
   fi
 fi
 
+
 if [ $stage -le -1 ]; then
   # Convert the alignments.
   echo "$0: Converting alignments from $alidir to use current tree"
@@ -176,6 +186,7 @@ fi
 
 [ "$exit_stage" -eq 0 ] && echo "$0: Exiting early: --exit-stage $exit_stage" && exit 0;
 
+
 if [ $stage -le 0 ] && [ "$realign_iters" != "" ]; then
   echo "$0: Compiling graphs of transcripts"
   $cmd JOB=1:$nj $dir/log/compile_graphs.JOB.log \
@@ -184,11 +195,12 @@ if [ $stage -le 0 ] && [ "$realign_iters" != "" ]; then
       "ark:|gzip -c >$dir/fsts.JOB.gz" || exit 1;
 fi
 
+
 x=1
 while [ $x -lt $num_iters ]; do
-   echo Pass $x
+  echo "Pass $x"
   if echo $realign_iters | grep -w $x >/dev/null && [ $stage -le $x ]; then
-    echo Aligning data
+    echo "Aligning data"
     mdl="gmm-boost-silence --boost=$boost_silence `cat $lang/phones/optional_silence.csl` $dir/$x.mdl - |"
     $cmd JOB=1:$nj $dir/log/align.$x.JOB.log \
       gmm-align-compiled $scale_opts --beam=$beam --retry-beam=$retry_beam --careful=$careful "$mdl" \
@@ -198,7 +210,7 @@ while [ $x -lt $num_iters ]; do
 
   if echo $fmllr_iters | grep -w $x >/dev/null; then
     if [ $stage -le $x ]; then
-      echo Estimating fMLLR transforms
+      echo "Estimating fMLLR transforms"
       # We estimate a transform that's additional to the previous transform;
       # we'll compose them.
       $cmd JOB=1:$nj $dir/log/fmllr.$x.JOB.log \
@@ -207,6 +219,7 @@ while [ $x -lt $num_iters ]; do
         gmm-est-fmllr --fmllr-update-type=$fmllr_update_type \
         --spk2utt=ark:$sdata/JOB/spk2utt $dir/$x.mdl \
         "$feats" ark:- ark:$dir/tmp_trans.JOB || exit 1;
+
       for n in `seq $nj`; do
         ! ( compose-transforms --b-is-affine=true \
           ark:$dir/tmp_trans.$n ark:$cur_trans_dir/trans.$n ark:$dir/composed_trans.$n \
@@ -230,6 +243,7 @@ while [ $x -lt $num_iters ]; do
     rm $dir/$x.mdl $dir/$x.*.acc
     rm $dir/$x.occs
   fi
+
   [ $x -le $max_iter_inc ] && numgauss=$[$numgauss+$incgauss];
   x=$[$x+1];
 done

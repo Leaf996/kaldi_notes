@@ -14,8 +14,8 @@ done
 # This script takes no arguments.  It assumes you have already run
 # aidatatang_data_prep.sh.
 # It takes as input the files
-#data/local/train/text
-#data/local/dict/lexicon.txt
+#   data/local/train/text
+#   data/local/dict/lexicon.txt
 dir=data/local/lm
 mkdir -p $dir
 

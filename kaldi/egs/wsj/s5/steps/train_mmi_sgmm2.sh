@@ -8,7 +8,7 @@
 cmd=run.pl
 num_iters=4
 boost=0.0
-cancel=true # if true, cancel num and den counts on each frame.
+cancel=true       # if true, cancel num and den counts on each frame.
 drop_frames=false # this is the same as frame dropping (see Karel's ICASSP2013 paper).
 acwt=0.1
 stage=0
@@ -40,6 +40,7 @@ alidir=$3
 denlatdir=$4
 dir=$5
 mkdir -p $dir/log
+
 
 utils/lang/check_phones_compatible.sh $lang/phones.txt $alidir/phones.txt || exit 1;
 cp $lang/phones.txt $dir || exit 1;

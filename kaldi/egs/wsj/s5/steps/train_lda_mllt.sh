@@ -17,24 +17,24 @@ stage=-5
 scale_opts="--transition-scale=1.0 --acoustic-scale=0.1 --self-loop-scale=0.1"
 realign_iters="10 20 30";
 mllt_iters="2 4 6 12";
-num_iters=35    # Number of iterations of training
-max_iter_inc=25  # Last iter to increase #Gauss on.
+num_iters=35      # Number of iterations of training
+max_iter_inc=25   # Last iter to increase #Gauss on.
 dim=40
 beam=10
 retry_beam=40
 careful=false
 boost_silence=1.0 # Factor by which to boost silence likelihoods in alignment
-power=0.25 # Exponent for number of gaussians according to occurrence counts
-randprune=4.0 # This is approximately the ratio by which we will speed up the
-              # LDA and MLLT calculations via randomized pruning.
+power=0.25        # Exponent for number of gaussians according to occurrence counts
+randprune=4.0     # This is approximately the ratio by which we will speed up the
+                  # LDA and MLLT calculations via randomized pruning.
 splice_opts=
-cluster_thresh=-1  # for build-tree control final bottom-up clustering of leaves
-norm_vars=false # deprecated.  Prefer --cmvn-opts "--norm-vars=false"
+cluster_thresh=-1 # for build-tree control final bottom-up clustering of leaves
+norm_vars=false   # deprecated.  Prefer --cmvn-opts "--norm-vars=false"
 cmvn_opts=
-context_opts=   # use "--context-width=5 --central-position=2" for quinphone.
+context_opts=     # use "--context-width=5 --central-position=2" for quinphone(五音素).
 # End configuration.
-train_tree=true  # if false, don't actually train the tree.
-use_lda_mat=  # If supplied, use this LDA[+MLLT] matrix.
+train_tree=true   # if false, don't actually train the tree.
+use_lda_mat=      # If supplied, use this LDA[+MLLT] matrix.
 
 echo "$0 $@"  # Print the command line for logging
 
@@ -58,31 +58,34 @@ lang=$4
 alidir=$5
 dir=$6
 
+
 for f in $alidir/final.mdl $alidir/ali.1.gz $data/feats.scp $lang/phones.txt; do
   [ ! -f $f ] && echo "train_lda_mllt.sh: no such file $f" && exit 1;
 done
 
 numgauss=$numleaves
-incgauss=$[($totgauss-$numgauss)/$max_iter_inc] # per-iter #gauss increment
+incgauss=$[($totgauss-$numgauss)/$max_iter_inc]   # per-iter #gauss increment
 oov=`cat $lang/oov.int` || exit 1;
 nj=`cat $alidir/num_jobs` || exit 1;
 silphonelist=`cat $lang/phones/silence.csl` || exit 1;
 ciphonelist=`cat $lang/phones/context_indep.csl` || exit 1;
+
 
 mkdir -p $dir/log
 
 utils/lang/check_phones_compatible.sh $lang/phones.txt $alidir/phones.txt || exit 1;
 cp $lang/phones.txt $dir || exit 1;
 
+
 echo $nj >$dir/num_jobs
-echo "$splice_opts" >$dir/splice_opts # keep track of frame-splicing options
-           # so that later stages of system building can know what they were.
+echo "$splice_opts" >$dir/splice_opts   # keep track of frame-splicing options
+                                        # so that later stages of system building can know what they were.
 
 
 [ $(cat $alidir/cmvn_opts 2>/dev/null | wc -c) -gt 1 ] && [ -z "$cmvn_opts" ] && \
   echo "$0: warning: ignoring CMVN options from source directory $alidir"
 $norm_vars && cmvn_opts="--norm-vars=true $cmvn_opts"
-echo $cmvn_opts > $dir/cmvn_opts # keep track of options to CMVN.
+echo $cmvn_opts > $dir/cmvn_opts        # keep track of options to CMVN.
 
 sdata=$data/split$nj;
 split_data.sh $data $nj || exit 1;
@@ -146,6 +149,7 @@ if [ $stage -le -3 ] && $train_tree; then
     $dir/questions.qst $lang/topo $dir/tree || exit 1;
 fi
 
+
 if [ $stage -le -2 ]; then
   echo "$0: Initializing the model"
   if $train_tree; then
@@ -170,6 +174,7 @@ if [ $stage -le -1 ]; then
      "ark:gunzip -c $alidir/ali.JOB.gz|" "ark:|gzip -c >$dir/ali.JOB.gz" || exit 1;
 fi
 
+
 if [ $stage -le 0 ] && [ "$realign_iters" != "" ]; then
   echo "$0: Compiling graphs of transcripts"
   $cmd JOB=1:$nj $dir/log/compile_graphs.JOB.log \
@@ -181,23 +186,23 @@ fi
 
 x=1
 while [ $x -lt $num_iters ]; do
-  echo Training pass $x
+  echo "Training pass $x"
   if echo $realign_iters | grep -w $x >/dev/null && [ $stage -le $x ]; then
-    echo Aligning data
+    echo "Aligning data"
     mdl="gmm-boost-silence --boost=$boost_silence `cat $lang/phones/optional_silence.csl` $dir/$x.mdl - |"
     $cmd JOB=1:$nj $dir/log/align.$x.JOB.log \
       gmm-align-compiled $scale_opts --beam=$beam --retry-beam=$retry_beam --careful=$careful "$mdl" \
       "ark:gunzip -c $dir/fsts.JOB.gz|" "$feats" \
       "ark:|gzip -c >$dir/ali.JOB.gz" || exit 1;
   fi
+
   if echo $mllt_iters | grep -w $x >/dev/null; then
     if [ $stage -le $x ]; then
       echo "$0: Estimating MLLT"
       $cmd JOB=1:$nj $dir/log/macc.$x.JOB.log \
         ali-to-post "ark:gunzip -c $dir/ali.JOB.gz|" ark:- \| \
         weight-silence-post 0.0 $silphonelist $dir/$x.mdl ark:- ark:- \| \
-        gmm-acc-mllt --rand-prune=$randprune  $dir/$x.mdl "$feats" ark:- $dir/$x.JOB.macc \
-        || exit 1;
+        gmm-acc-mllt --rand-prune=$randprune  $dir/$x.mdl "$feats" ark:- $dir/$x.JOB.macc || exit 1;
       est-mllt $dir/$x.mat.new $dir/$x.*.macc 2> $dir/log/mupdate.$x.log || exit 1;
       gmm-transform-means  $dir/$x.mat.new $dir/$x.mdl $dir/$x.mdl \
         2> $dir/log/transform_means.$x.log || exit 1;
@@ -217,9 +222,11 @@ while [ $x -lt $num_iters ]; do
         $dir/$x.mdl "gmm-sum-accs - $dir/$x.*.acc |" $dir/$[$x+1].mdl || exit 1;
     rm $dir/$x.mdl $dir/$x.*.acc $dir/$x.occs
   fi
+
   [ $x -le $max_iter_inc ] && numgauss=$[$numgauss+$incgauss];
   x=$[$x+1];
 done
+
 
 rm $dir/final.{mdl,mat,occs} 2>/dev/null
 ln -s $x.mdl $dir/final.mdl

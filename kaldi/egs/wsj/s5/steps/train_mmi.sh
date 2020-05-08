@@ -12,9 +12,9 @@
 cmd=run.pl
 num_iters=4
 boost=0.0
-cancel=true # if true, cancel num and den counts on each frame.
-drop_frames=false # if true, ignore stats from frames where num + den
-                       # have no overlap. 
+cancel=true         # if true, cancel num and den counts on each frame.
+drop_frames=false   # if true, ignore stats from frames where num + den
+                    # have no overlap.
 tau=400
 weight_tau=10
 acwt=0.1

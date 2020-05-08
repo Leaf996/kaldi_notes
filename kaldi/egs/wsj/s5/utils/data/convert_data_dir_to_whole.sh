@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 # Copyright 2016-2018  Vimal Manohar
 # Apache 2.0
@@ -21,6 +21,7 @@ fi
 
 data=$1
 dir=$2
+
 
 if [ ! -f $data/segments ]; then
   echo "$0: Data directory already does not contain segments. So just copying it."

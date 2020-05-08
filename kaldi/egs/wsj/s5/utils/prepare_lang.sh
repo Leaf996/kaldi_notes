@@ -74,8 +74,6 @@ extra_word_disambig_syms=        # if set, add disambiguation symbols from this 
 num_extra_phone_disambig_syms=1 # Standard one phone disambiguation symbol is used for optional silence.
                                 # Increasing this number does not harm, but is only useful if you later
                                 # want to introduce this labels to L_disambig.fst
-
-
 # end configuration sections
 
 echo "$0 $@"  # Print the command line for logging

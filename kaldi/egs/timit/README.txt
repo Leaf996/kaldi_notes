@@ -27,7 +27,7 @@ of experiments.
       Phone Recognition Using Hidden Markov Models. IEEE TRANSACTIONS ON
       ACOUSTICS. SPEECH, AND SIGNAL PROCESSING, VOL. 31. NO. 11, PG. 1641-48,
       NOVEMBER 1989, ). In scoring we map to 39 phonememes, as is usually 
-      done in conference papers. 
+      done in conference papers.
       The earlier versions of TIMIT scripts were implemented by Navdeep Jaitly,
       Arnab Ghoshal. Current version was developed by Bagher BabaAli and is 
       maintained by Karel Vesely (vesis84@gmail.com).

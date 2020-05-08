@@ -11,29 +11,29 @@
 
 # Begin configuration section.
 cmd=run.pl
-stage=-6 # use this to resume partially finished training
-context_opts= # e.g. set it to "--context-width=5 --central-position=2"  for a
-# quinphone system.
+stage=-6            # use this to resume partially finished training
+context_opts=       # e.g. set it to "--context-width=5 --central-position=2"  for a
+                    # quinphone system.
 scale_opts="--transition-scale=1.0 --acoustic-scale=0.1 --self-loop-scale=0.1"
-num_iters=25   # Total number of iterations of training
-num_iters_alimdl=3 # Number of iterations for estimating alignment model.
-max_iter_inc=15 # Last iter to increase #substates on.
-realign_iters="5 10 15"; # Iters to realign on.
-spkvec_iters="5 8 12 17" # Iters to estimate speaker vectors on.
+num_iters=25        # Total number of iterations of training
+num_iters_alimdl=3  # Number of iterations for estimating alignment model.
+max_iter_inc=15     # Last iter to increase #substates on.
+realign_iters="5 10 15";  # Iters to realign on.
+spkvec_iters="5 8 12 17"  # Iters to estimate speaker vectors on.
 increase_iters="6 10 14"; # Iters on which to increase phn dim and/or spk dim;
-    # rarely necessary, and if it is, only the 1st will normally be necessary.
-rand_prune=0.1 # Randomized-pruning parameter for posteriors, to speed up training.
-               # Bigger -> more pruning; zero = no pruning.
-phn_dim=  # You can use this to set the phonetic subspace dim. [default: feat-dim+1]
-spk_dim=  # You can use this to set the speaker subspace dim. [default: feat-dim]
-power=0.25 # Exponent for number of gaussians according to occurrence counts
+                          # rarely necessary, and if it is, only the 1st will normally be necessary.
+rand_prune=0.1      # Randomized-pruning parameter for posteriors, to speed up training.
+                    # Bigger -> more pruning; zero = no pruning.
+phn_dim=            # You can use this to set the phonetic subspace dim. [default: feat-dim+1]
+spk_dim=            # You can use this to set the speaker subspace dim. [default: feat-dim]
+power=0.25          # Exponent for number of gaussians according to occurrence counts
 beam=8
 self_weight=0.9
 retry_beam=40
-leaves_per_group=5 # Relates to the SCTM (state-clustered tied-mixture) aspect:
-                   # average number of pdfs in a "group" of pdfs.
+leaves_per_group=5  # Relates to the SCTM (state-clustered tied-mixture) aspect:
+                    # average number of pdfs in a "group" of pdfs.
 update_m_iter=4
-spk_dep_weights=true # [Symmetric SGMM] set this to false if you don't want "u" (i.e. to turn off
+spk_dep_weights=true  # [Symmetric SGMM] set this to false if you don't want "u" (i.e. to turn off
                       # symmetric SGMM.
 # End configuration section.
 

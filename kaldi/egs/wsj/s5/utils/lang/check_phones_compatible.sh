@@ -22,6 +22,7 @@
 # phones.txt to model directories, this script exits silently with status 0
 # if one of the phone symbol tables does not exist.
 
+
 . utils/parse_options.sh || exit 1;
 
 if [ $# -ne 2 ]; then
@@ -32,6 +33,7 @@ fi
 
 table_first=$1
 table_second=$2
+
 
 # check if the files exist or not
 if [ ! -f $table_first ]; then
@@ -49,6 +51,7 @@ elif [ ! -f $table_second ]; then
   # For back compatibility, this script exits silently with status 0.
   exit 0;
 fi
+
 
 # Check if the two tables are the same (except for possible difference in disambiguation symbols).
 if ! cmp -s <(grep -v "^#" $table_first) <(grep -v "^#" $table_second); then
