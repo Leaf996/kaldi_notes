@@ -1,0 +1,3 @@
+# optional silence
+- Possibly during training you did not put silence in your transcripts in all the places where silence actually appears (including at the beginning and end of utterances). **This would force the non-silence phones to learn to model silence also**.
+- It might be better to train the system using the optional silence, and then prepare a different lang directory where you disable optional silence, and use that one to do the final alignment; just make sure the phones.txt is the same.

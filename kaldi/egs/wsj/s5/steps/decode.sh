@@ -4,19 +4,19 @@
 # Apache 2.0
 
 # Begin configuration section.
-transform_dir=   # this option won't normally be used, but it can be used if you want to
-                 # supply existing fMLLR transforms when decoding.
+transform_dir=    # this option won't normally be used, but it can be used if you want to
+                  # supply existing fMLLR transforms when decoding.
 iter=
-model= # You can specify the model to use (e.g. if you want to use the .alimdl)
+model=            # You can specify the model to use (e.g. if you want to use the .alimdl)
 stage=0
 nj=4
 cmd=run.pl
 max_active=7000
 beam=13.0
 lattice_beam=6.0
-acwt=0.083333   # note: only really affects pruning (scoring is on lattices).
-num_threads=1   # if >1, will use gmm-latgen-faster-parallel
-parallel_opts=  # ignored now.
+acwt=0.083333     # note: only really affects pruning (scoring is on lattices).
+num_threads=1     # if > 1, will use gmm-latgen-faster-parallel
+parallel_opts=    # ignored now.
 scoring_opts=
 # note: there are no more min-lmwt and max-lmwt options, instead use
 # e.g. --scoring-opts "--min-lmwt 1 --max-lmwt 20"
@@ -55,7 +55,7 @@ if [ $# != 3 ]; then
 fi
 
 
-graphdir=$1
+graphdir=$1            # HCLG
 data=$2
 dir=$3
 srcdir=`dirname $dir`; # The model directory is one level up from decoding directory.

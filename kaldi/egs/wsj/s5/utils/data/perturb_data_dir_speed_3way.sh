@@ -11,9 +11,10 @@
 # If you add the option "--always-include-prefix true", it will include the
 # prefix "sp1.0-" for the original un-perturbed data.  This can help resolve
 # problems with sorting.
-# We don't make '--always-include-prefix true' the default  behavior because
+# We don't make '--always-include-prefix true' the default behavior because
 # it can break some older scripts that relied on the original utterance-ids
 # being a subset of the perturbed data's utterance-ids.
+
 
 always_include_prefix=false
 
@@ -34,6 +35,7 @@ if [ $# != 2 ]; then
   exit 1
 fi
 
+
 srcdir=$1
 destdir=$2
 
@@ -43,18 +45,21 @@ if [ ! -f $srcdir/wav.scp ]; then
 fi
 
 if [ -f $destdir/feats.scp ]; then
-  echo "$0: $destdir/feats.scp already exists: refusing to run this (please delete $destdir/feats.scp if you want this to run)"
+  echo "$0: $destdir/feats.scp already exists: refusing to run this"
+  echo "(please delete $destdir/feats.scp if you want this to run)"
   exit 1
 fi
+
 
 echo "$0: making sure the utt2dur and the reco2dur files are present"
 echo "... in ${srcdir}, because obtaining it after speed-perturbing"
 echo "... would be very slow, and you might need them."
-utils/data/get_utt2dur.sh ${srcdir}
+utils/data/get_utt2dur.sh  ${srcdir}
 utils/data/get_reco2dur.sh ${srcdir}
 
 utils/data/perturb_data_dir_speed.sh 0.9 ${srcdir} ${destdir}_speed0.9 || exit 1
 utils/data/perturb_data_dir_speed.sh 1.1 ${srcdir} ${destdir}_speed1.1 || exit 1
+
 
 if $always_include_prefix; then
   utils/copy_data_dir.sh --spk-prefix sp1.0- --utt-prefix sp1.0- ${srcdir} ${destdir}_speed1.0
@@ -76,5 +81,6 @@ if ! utils/validate_data_dir.sh --no-feats --no-text $destdir; then
   echo "$0: Validation failed.  If it is a sorting issue, try the option '--always-include-prefix true'."
   exit 1
 fi
+
 
 exit 0

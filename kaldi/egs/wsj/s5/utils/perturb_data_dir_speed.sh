@@ -7,14 +7,15 @@
 
 # This script operates on a directory, such as in data/train/,
 # that contains some subset of the following files:
-#  wav.scp
-#  spk2utt
-#  utt2spk
-#  text
-#  utt2dur
-#  reco2dur
+#   wav.scp
+#   spk2utt
+#   utt2spk
+#   text
+#   utt2dur
+#   reco2dur
 #
 # It generates the files which are used for perturbing the speed of the original data.
+
 
 . utils/parse_options.sh
 
@@ -34,7 +35,8 @@ label="sp"
 spk_prefix=$label$factor"-"
 utt_prefix=$label$factor"-"
 
-#check is sox on the path
+
+# check is sox on the path
 which sox &>/dev/null
 ! [ $? -eq 0 ] && echo "sox: command not found" && exit 1;
 
@@ -47,6 +49,7 @@ if [ "$destdir" == "$srcdir" ]; then
   echo "$0: this script requires <srcdir> and <destdir> to be different."
   exit 1
 fi
+
 
 set -e;
 set -o pipefail

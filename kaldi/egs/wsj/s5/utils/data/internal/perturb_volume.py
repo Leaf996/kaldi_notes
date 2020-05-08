@@ -26,6 +26,7 @@ def get_args():
         distribution between --scale-low and --scale-high.
         """)
 
+
     parser.add_argument("--scale-low", type=float, default=0.125,
                         help="Minimum volume scale to be applied.")
     parser.add_argument("--scale-high", type=float, default=2,
@@ -38,6 +39,7 @@ def get_args():
                         help="If provided, the volume scale used for each "
                         "recording will be written to this file")
     args = parser.parse_args()
+
 
     if args.reco2vol == "":
         args.reco2vol = None
@@ -75,6 +77,7 @@ def run(args):
 
     if args.write_reco2vol is not None:
         volume_writer = open(args.write_reco2vol, 'w')
+
 
     for line in sys.stdin.readlines():
         if len(line.strip()) == 0:

@@ -4,14 +4,14 @@
 # Apache 2.0
 
 # This script creates a fully expanded decoding graph (HCLG) that represents        # HCLG
-# all the language-model, pronunciation dictionary (lexicon), context-dependency,
-# and HMM structure in our model.  The output is a Finite State Transducer
+# all the language-model, pronunciation dictionary(lexicon), context-dependency,
+# and HMM structure in our model. The output is a Finite State Transducer
 # that has word-ids on the output, and pdf-ids on the input (these are indexes      # word-id output, pdf-id input
 # that resolve to Gaussian Mixture Models).
 # See
-#  http://kaldi-asr.org/doc/graph_recipe_test.html
-# (this is compiled from this repository using Doxygen,
-# the source for this part is in src/doc/graph_recipe_test.dox)
+#   http://kaldi-asr.org/doc/graph_recipe_test.html
+#   (this is compiled from this repository using Doxygen,
+#   the source for this part is in src/doc/graph_recipe_test.dox)
 
 set -o pipefail
 
@@ -22,7 +22,7 @@ remove_oov=false
 
 for x in `seq 4`; do
   # https://stackoverflow.com/questions/4223294/using-or-in-shell-script
-  [ "$1" == "--mono" -o "$1" == "--left-biphone" -o "$1" == "--quinphone" ] && shift && \
+  [ "$1" == "--mono"  -o  "$1" == "--left-biphone"  -o  "$1" == "--quinphone" ] && shift && \
     echo "WARNING: the --mono, --left-biphone and --quinphone options are now deprecated and ignored."
   [ "$1" == "--remove-oov" ] && remove_oov=true && shift;
   [ "$1" == "--transition-scale" ] && tscale=$2 && shift 2;
@@ -34,7 +34,7 @@ if [ $# != 3 ]; then
    echo "Usage: utils/mkgraph.sh [options] <lang-dir> <model-dir> <graphdir>"
    echo "e.g.: utils/mkgraph.sh data/lang_test exp/tri1/ exp/tri1/graph"
    echo " Options:"
-   echo " --remove-oov       #  If true, any paths containing the OOV symbol (obtained from oov.int"
+   echo " --remove-oov       #  If true, any paths containing the OOV symbol(obtained from oov.int"
    echo "                    #  in the lang directory) are removed from the G.fst during compilation."
    echo " --transition-scale #  Scaling factor on transition probabilities."
    echo " --self-loop-scale  #  Please see: http://kaldi-asr.org/doc/hmm.html#hmm_scale."
@@ -45,10 +45,11 @@ fi
 
 if [ -f path.sh ]; then . ./path.sh; fi
 
-lang=$1
-tree=$2/tree
-model=$2/final.mdl
-dir=$3
+
+lang=$1               # L,G
+tree=$2/tree          # C
+model=$2/final.mdl    # H
+dir=$3                # HCLG
 
 mkdir -p $dir
 
@@ -75,7 +76,7 @@ if [ -f $dir/HCLG.fst ]; then
 fi
 
 
-N=$(tree-info $tree | grep "context-width" | cut -d' ' -f2) || { echo "Error when getting context-width"; exit 1; }
+N=$(tree-info $tree | grep "context-width"    | cut -d' ' -f2) || { echo "Error when getting context-width";    exit 1; }
 P=$(tree-info $tree | grep "central-position" | cut -d' ' -f2) || { echo "Error when getting central-position"; exit 1; }
 
 
@@ -83,7 +84,7 @@ P=$(tree-info $tree | grep "central-position" | cut -d' ' -f2) || { echo "Error 
   echo "$0: WARNING: chain models need '--self-loop-scale 1.0'";
 
 
-if [ -f $lang/phones/nonterm_phones_offset.int ]; then
+if [ -f $lang/phones/nonterm_phones_offset.int ]; then    # non-terminal
   if [[ $N != 2  || $P != 1 ]]; then
     echo "$0: when doing grammar decoding, you can only build graphs for left-biphone trees."
     exit 1
@@ -104,7 +105,7 @@ trap "rm -f $lang/tmp/LG.fst.$$" EXIT HUP INT PIPE TERM
 if [[ ! -s $lang/tmp/LG.fst || $lang/tmp/LG.fst -ot $lang/G.fst || \
       $lang/tmp/LG.fst -ot $lang/L_disambig.fst ]]; then
   fsttablecompose $lang/L_disambig.fst $lang/G.fst | fstdeterminizestar --use-log=true | \
-    fstminimizeencoded | fstpushspecial > $lang/tmp/LG.fst.$$ || exit 1;
+    fstminimizeencoded | fstpushspecial > $lang/tmp/LG.fst.$$ || exit 1;    # thread id
   mv $lang/tmp/LG.fst.$$ $lang/tmp/LG.fst
   fstisstochastic $lang/tmp/LG.fst || echo "[info]: LG not stochastic."
 fi
@@ -137,6 +138,7 @@ if [[ ! -s $dir/Ha.fst || $dir/Ha.fst -ot $model  \
   mv $dir/Ha.fst.$$ $dir/Ha.fst
 fi
 
+
 trap "rm -f $dir/HCLGa.fst.$$" EXIT HUP INT PIPE TERM
 if [[ ! -s $dir/HCLGa.fst || $dir/HCLGa.fst -ot $dir/Ha.fst || \
       $dir/HCLGa.fst -ot $clg ]]; then
@@ -152,6 +154,7 @@ if [[ ! -s $dir/HCLGa.fst || $dir/HCLGa.fst -ot $dir/Ha.fst || \
   fstisstochastic $dir/HCLGa.fst || echo "HCLGa is not stochastic"
 fi
 
+
 trap "rm -f $dir/HCLG.fst.$$" EXIT HUP INT PIPE TERM
 if [[ ! -s $dir/HCLG.fst || $dir/HCLG.fst -ot $dir/HCLGa.fst ]]; then
   add-self-loops --self-loop-scale=$loopscale --reorder=true $model $dir/HCLGa.fst | \
@@ -164,12 +167,14 @@ if [[ ! -s $dir/HCLG.fst || $dir/HCLG.fst -ot $dir/HCLGa.fst ]]; then
   fi
 fi
 
+
 # note: the empty FST has 66 bytes.  this check is for whether the final FST
 # is the empty file or is the empty FST.
 if ! [ $(head -c 67 $dir/HCLG.fst | wc -c) -eq 67 ]; then
   echo "$0: it looks like the result in $dir/HCLG.fst is empty"
   exit 1
 fi
+
 
 # save space.
 rm $dir/HCLGa.fst $dir/Ha.fst 2>/dev/null || true
