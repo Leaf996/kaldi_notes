@@ -18,10 +18,11 @@
 # limitations under the License.
 
 
-# Adds disambiguation symbols to a lexicon.
+# Adds disambiguation symbols to a lexicon.                     # 消岐符号
 # Outputs still in the normal lexicon format.
 # Disambig syms are numbered #1, #2, #3, etc. (#0
 # reserved for symbol in grammar).
+#
 # Outputs the number of disambig syms to the standard output.
 # With the --pron-probs option, expects the second field
 # of each lexicon line to be a pron-prob.
@@ -51,6 +52,7 @@ for ($n = 1; $n <= 3 && @ARGV > 0; $n++) {
     shift @ARGV;
   }
 }
+
 
 if (@ARGV != 2) {
   die "Usage: add_lex_disambig.pl [opts] <lexicon-in> <lexicon-out>\n" .
@@ -88,9 +90,7 @@ while(<L>) {
     push @L, join(" ", @A);
 }
 
-# (2) Work out the count of each phone-sequence in the
-# lexicon.
-
+# (2) Work out the count of each phone-sequence in the lexicon.
 foreach $l (@L) {
     @A = split(" ", $l);
     shift @A; # Remove word.
@@ -114,7 +114,6 @@ foreach $l (@L) {
 
 # (3) For each left sub-sequence of each phone-sequence, note down
 # that it exists (for identifying prefixes of longer strings).
-
 foreach $l (@L) {
     @A = split(" ", $l);
     shift @A; # Remove word.
@@ -131,10 +130,10 @@ foreach $l (@L) {
 }
 
 # (4) For each entry in the lexicon:
-#  if the phone sequence is unique and is not a
-#  prefix of another word, no diambig symbol.
-#  Else output #1, or #2, #3, ... if the same phone-seq
-#  has already been assigned a disambig symbol.
+#   if the phone sequence is unique and is not a
+#     prefix of another word, no diambig symbol.
+#   Else output #1, or #2, #3, ... if the same phone-seq
+#     has already been assigned a disambig symbol.
 
 
 open(O, ">$lexoutfn") || die "Opening lexicon file $lexoutfn for writing.\n";

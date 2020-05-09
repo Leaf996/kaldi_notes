@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2012-2013  Johns Hopkins University (Author: Daniel Povey);
+# Copyright 2012-2013  Johns Hopkins University (Author: Daniel Povey)
 #                      Arnab Ghoshal
 #                2014  Guoguo Chen
 #                2015  Hainan Xu
@@ -19,29 +19,26 @@
 # limitations under the License.
 
 # This script prepares a directory such as data/lang/, in the standard format,
-# <1>
-# given a source directory containing a dictionary lexicon.txt in a form like:
-# word phone1 phone2 ... phoneN
-# per line (alternate prons would be separate lines),
-#                   or a dictionary with probabilities
-# called lexiconp.txt in a form:
-# word pron-prob phone1 phone2 ... phoneN
-# (with 0.0 < pron-prob <= 1.0); note: if lexiconp.txt exists, we use it even if
-# lexicon.txt exists.
+# <1> given a source directory containing a dictionary lexicon.txt in a form like:
+#                     word phone1 phone2 ... phoneN
+# per line (alternate prons would be separate lines), or a dictionary with
+# probabilities called lexiconp.txt in a form:
+#                     word pron-prob phone1 phone2 ... phoneN
+# (with 0.0 < pron-prob <= 1.0);
+# note: if lexiconp.txt exists, we use it even if lexicon.txt exists.
 #
 #
-# <2>
-# and also files silence_phones.txt, nonsilence_phones.txt, optional_silence.txt
+# <2> also files silence_phones.txt, nonsilence_phones.txt, optional_silence.txt
 # and extra_questions.txt
-# Here, silence_phones.txt and nonsilence_phones.txt are lists of silence and
+#   Here, silence_phones.txt and nonsilence_phones.txt are lists of silence and
 # non-silence phones respectively (where silence includes various kinds of
 # noise, laugh, cough, filled pauses etc., and nonsilence phones includes the
 # "real" phones.)
-# In each line of those files is a list of phones, and the phones on each line
+#   In each line of those files is a list of phones, and the phones on each line
 # are assumed to correspond to the same "base phone", i.e. they will be
 # different stress or tone variations of the same basic phone.
 #
-# The file "optional_silence.txt" contains just a single phone (typically SIL)
+#   The file "optional_silence.txt" contains just a single phone (typically SIL)
 # which is used for optional silence in the lexicon.
 #
 # extra_questions.txt might be empty; typically will consist of lists of phones,
