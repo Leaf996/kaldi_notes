@@ -18,6 +18,7 @@
 # the actually encoding, we just need to
 # make sure the length of the (decoded) string
 # is correct (to make the output formatting looking right).
+
 sub get_utf8_or_bytestream {
   use Encode qw(decode encode);
   my $is_utf_compatible = 1;
