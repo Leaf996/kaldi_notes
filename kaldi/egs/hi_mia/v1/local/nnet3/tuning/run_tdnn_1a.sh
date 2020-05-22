@@ -4,6 +4,7 @@
 #           2020 AIShell-Foundation (Author: Bengu WU) 
 #           2020 Beijing Shell Shell Tech. Co. Ltd. (Author: Hui BU) 
 # Apache 2.0
+
 set -e
 stage=0
 train_stage=-10
@@ -19,6 +20,7 @@ num_jobs_final=1
 nj=30
 remove_egs=true
 num_targets=
+
 . parse_options.sh || exit 1;
 
 # End configuration section.

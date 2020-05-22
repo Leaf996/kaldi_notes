@@ -10,13 +10,14 @@ import numpy as np
 import argparse
 import sys
 import copy
+
 class Edge:
     def __init__(self, cur_state, to_state, isymbol, osymbol):
         self.cur_state = int(cur_state)
         self.to_state = int(to_state)
         self.isymbol = int(isymbol)
         self.osymbol = int(osymbol)
-    
+
     def getToState(self):
         return self.to_state
 
@@ -32,7 +33,7 @@ class State:
             if i == inputId:
                 return True
         return False
-    
+
     def getOutput(self, inputId):
         if inputId in self.inputSymbol:
             pos = self.inputSymbol.index(inputId)
@@ -200,7 +201,7 @@ if __name__=='__main__':
         description="This script is for keyword filler system to do fst\n")
     parser.add_argument('Fst_file',help='Fst file')
     parser.add_argument('bnf_file',help='output of network')
-    
+
     FLAGS = parser.parse_args()
 
     stateM = StateMachine(FLAGS.Fst_file)

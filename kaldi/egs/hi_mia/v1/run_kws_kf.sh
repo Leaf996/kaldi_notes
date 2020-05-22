@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Copyright 2020 Audio, Speech and Language Processing Group (ASLP@NPU), Northwestern Polytechnical University (Authors: Zhuoyuan Yao, Xiong Wang, Jingyong Hou, Lei Xie)
-#           2020 AIShell-Foundation (Author: Bengu WU) 
-#           2020 Beijing Shell Shell Tech. Co. Ltd. (Author: Hui BU) 
+# Copyright 2020 Audio, Speech and Language Processing Group(ASLP@NPU), Northwestern Polytechnical University(Authors: Zhuoyuan Yao, Xiong Wang, Jingyong Hou, Lei Xie)
+#           2020 AIShell-Foundation (Author: Bengu WU)
+#           2020 Beijing Shell Shell Tech. Co. Ltd. (Author: Hui BU)
 # Apache 2.0
 
 # if do_train_aishell is false we should prepare aishell data and tri3a ourselves
@@ -28,11 +28,12 @@ use_fst=$true
 
 stage=0
 
-# if false we will not train aishell model,
+# if false we will not train aishell model
 do_train_aishell1=$true
 
 . ./cmd.sh
 . ./path.sh
+
 
 if [ $stage -le 0 ]; then
 	mkdir -p $data_kws
@@ -47,8 +48,10 @@ if [ $stage -le 0 ]; then
 	# You should write your own path to this script
 	local/prepare_kws.sh || exit 1;
 fi
+
+
 if [ $stage -le 1 ]; then
-	if [ $do_train_aishell1 ];then
+	if [ $do_train_aishell1 ]; then
 		# Lexicon Preparation,
 		local/aishell_prepare_dict.sh data/aishell/local || exit 1;
 
@@ -68,11 +71,12 @@ if [ $stage -le 1 ]; then
 	fi
 fi
 
+
 # Prepare mfcc for aishell and kws
-if [ $stage -le 2 ];then
+if [ $stage -le 2 ]; then
 	mfccdir=mfcc
 	for x in  train dev test; do
-		if [ $do_train_aishell1 ];then
+		if [ $do_train_aishell1 ]; then
 			steps/make_mfcc.sh --cmd "$train_cmd" --nj 10 data/$x exp/make_mfcc/$x $mfccdir || exit 1;
 			steps/compute_cmvn_stats.sh data/$x exp/make_mfcc/$x $mfccdir || exit 1;
 			utils/fix_data_dir.sh data/$x || exit 1;
@@ -83,55 +87,56 @@ if [ $stage -le 2 ];then
 	done
 fi
 
-if [ $do_train_aishell1 ];then
 
-if [ $stage -le 3 ];then
-	steps/train_mono.sh --cmd "$train_cmd" --nj 10 \
-		data/train data/lang exp/mono || exit 1;
-	steps/align_si.sh --cmd "$train_cmd" --nj 10 \
-		data/train data/lang exp/mono exp/mono_ali || exit 1;
+if [ $do_train_aishell1 ]; then
+	if [ $stage -le 3 ]; then
+		steps/train_mono.sh --cmd "$train_cmd" --nj 10 \
+			data/train data/lang exp/mono || exit 1;
+		steps/align_si.sh --cmd "$train_cmd" --nj 10 \
+			data/train data/lang exp/mono exp/mono_ali || exit 1;
+	fi
+
+	if [ $stage -le 4 ]; then
+		steps/train_deltas.sh --cmd "$train_cmd" \
+			2500 20000 data/train data/lang exp/mono_ali exp/tri1 || exit 1;
+		steps/align_si.sh --cmd "$train_cmd" --nj 10 \
+			data/train data/lang exp/tri1 exp/tri1_ali || exit 1;
+	fi
+
+	if [ $stage -le 5 ]; then
+		steps/train_deltas.sh --cmd "$train_cmd" \
+			2500 20000 data/train data/lang exp/tri1_ali exp/tri2 || exit 1;
+		steps/align_si.sh --cmd "$train_cmd" --nj 10 \
+			data/train data/lang exp/tri2 exp/tri2_ali || exit 1;
+	fi
+
+	if [ $stage -le 6 ]; then
+		steps/train_lda_mllt.sh --cmd "$train_cmd" \
+			2500 20000 data/train data/lang exp/tri2_ali exp/tri3a || exit 1;
+	fi
 fi
 
-if [ $stage -le 4 ];then
-	steps/train_deltas.sh --cmd "$train_cmd" \
-		2500 20000 data/train data/lang exp/mono_ali exp/tri1 || exit 1;
-	steps/align_si.sh --cmd "$train_cmd" --nj 10 \
-		data/train data/lang exp/tri1 exp/tri1_ali || exit 1;
-fi
 
-if [ $stage -le 5 ];then
-	steps/train_deltas.sh --cmd "$train_cmd" \
-		2500 20000 data/train data/lang exp/tri1_ali exp/tri2 || exit 1;
-	steps/align_si.sh --cmd "$train_cmd" --nj 10 \
-		data/train data/lang exp/tri2 exp/tri2_ali || exit 1;
-fi
-
-if [ $stage -le 6 ];then
-	steps/train_lda_mllt.sh --cmd "$train_cmd" \
-		2500 20000 data/train data/lang exp/tri2_ali exp/tri3a || exit 1;
-fi
-
-fi
-
-if [ $stage -le 7 ];then
-# use aishell tri3a align kws data
+if [ $stage -le 7 ]; then
+	# use aishell tri3a align kws data
 	for i in train dev test;do
 		echo $kws_word_split
 		awk '{print $1}' $data_kws/$i/wav.scp | while read -r line; do echo $line" "$kws_word_split;done >$data_kws/$i/text
-		#awk -v word=$kws_word_split '{print $1,word}' $data_kws/$i/wav.scp> $data_kws/$i/text 
 	done
-	for i in utt2spk spk2utt feats.scp cmvn.scp text wav.scp;do
+	for i in utt2spk spk2utt feats.scp cmvn.scp text wav.scp; do
 		cat $data_kws/train/$i $data_kws/test/$i $data_kws/dev/$i > $data_kws/$i
 	done
+
 	# utils/combine_data.sh data/merge/$i $data_aishell/$i $data_kws/$i
 	mkdir -p data/merge
-	for i in train dev test;do
+	for i in train dev test; do
 		mkdir -p data/merge/$i
 		for j in utt2spk spk2utt feats.scp cmvn.scp text wav.scp;do
 			cat $data_aishell/$i/$j $data_kws/$i/$j > data/merge/$i/$j
 		done
 		utils/fix_data_dir.sh data/merge/$i || exit 1;
 	done
+
 	awk '{print $1, 0}' $data_aishell/test/wav.scp > data/merge/negative
 	awk '{print $1, 1}' $data_kws/test/wav.scp > data/merge/positive
 	test_merge_data=data/merge
@@ -143,7 +148,8 @@ if [ $stage -le 7 ];then
       		data/merge/train $data_aishell/lang exp/tri3a $ali || exit 1;
 fi
 
-if [ $stage -le 8 ];then
+
+if [ $stage -le 8 ]; then
 	[ ! -d $kws_dict ] && mkdir -p $kws_dict;
     echo "Prepare keyword phone & id"
 
@@ -153,33 +159,37 @@ sil sil
 <gbg> <GBG>
 $kws_word $kws_phone
 EOF
+
 	cat <<EOF > $kws_dict/hotword.lexicon
 $kws_word $kws_phone
 EOF
+
 	echo "<eps> 0
 sil 1" > $kws_dict/phones.txt
 	count=2
-    awk '{for(i=2;i<=NF;i++){if(!match($i,"sil"))print $i}}' $kws_dict/lexicon.txt | sort | uniq  | while read -r line;do
+    awk '{for(i=2;i<=NF;i++){if(!match($i,"sil"))print $i}}' $kws_dict/lexicon.txt | sort | uniq  | while read -r line; do
 		echo "$line $count"
 		count=$(($count+1))
 	done >> $kws_dict/phones.txt
+
 	cat <<EOF > $kws_dict/words.txt
 <eps> 0
 <gbg> 1
 $kws_word 2
 EOF
+
 fi
 
-if [ $stage -le 9 ];then
+if [ $stage -le 9 ]; then
 	echo "merge and change alignment"
     awk -v hotword_phone=$kws_dict/phones.txt \
     'BEGIN {
         while (getline < hotword_phone) {
-            map[$1] = $2 
+            map[$1] = $2
         }
     }
     {
-        if(!match($1, "#") && !match($1, "<")) { 
+        if(!match($1, "#") && !match($1, "<")) {
 			if(match($1, "sil"))
 			{
 				printf("%s %s\n", $2, 1)
@@ -191,9 +201,10 @@ if [ $stage -le 9 ];then
         }
     }
     ' $data_aishell/lang/phones.txt > data/phone.map
+
 	mkdir -p exp/kws_ali_test
 	cur=$(cat $ali/num_jobs)
-	for x in $(seq 1 $cur);do
+	for x in $(seq 1 $cur); do
 		gunzip -c $ali/ali.$x.gz | 
 		ali-to-phones --per-frame=true exp/tri3a/final.mdl ark:- t,ark:- | 
 		utils/apply_map.pl -f 2- data/phone.map |
@@ -207,6 +218,7 @@ if [ $stage -le 9 ];then
 	ali=exp/kws_ali_test
 fi
 
+
 if [ $stage -le 10 ]; then
 	    echo "python local/gen_text_fst.py data/dict/hotword.lexicon data/dict/hotword.text.fst"
 		python local/gen_text_fst.py data/dict/hotword.lexicon data/dict/fst.txt 
@@ -216,7 +228,9 @@ if [ $stage -le 10 ]; then
 			data/dict/fst.txt | fstdeterminize | fstminimizeencoded > data/dict/hotword.openfst || exit 1;
 		fstprint data/dict/hotword.openfst data/dict/hotword.fst.txt
 fi
-if [ $stage -le 11 ];then
+
+
+if [ $stage -le 11 ]; then
 	echo "Extracting feats & Create tr cv set"
 	[ ! -d $feat_dir ] && mkdir -p $feat_dir
     [ ! -d data/wav ] && ln -s $data_aishell/wav data/
@@ -228,6 +242,8 @@ if [ $stage -le 11 ];then
 	utils/fix_data_dir.sh $feat_dir/train
 	utils/fix_data_dir.sh $feat_dir/test
 fi
+
+
 # train
 if [ $stage -le 12 ];then
 	num_targets=$(wc -l $kws_dict/phones.txt)
@@ -235,7 +251,7 @@ if [ $stage -le 12 ];then
 fi
 
 # p
-if [ $stage -le 13 ];then
+if [ $stage -le 13 ]; then
 	steps/nnet3/make_bottleneck_features.sh  \
 		--use_gpu true \
 		--nj 1 \
@@ -247,9 +263,9 @@ if [ $stage -le 13 ];then
  		exp/bnf || exit 1;
 fi
 
-if [ $stage -le 14 ];then
+if [ $stage -le 14 ]; then
 	copy-matrix ark:exp/bnf/raw_bnfeat_test.1.ark t,ark:exp/bnf/ark.txt
-	if [ $use_fst ];then
+	if [ $use_fst ]; then
 		python local/run_fst.py data/dict/hotword.fst.txt exp/bnf/ark.txt > result.txt
 	else
 		python local/kws_posterior_handling.py exp/bnf/ark.txt
