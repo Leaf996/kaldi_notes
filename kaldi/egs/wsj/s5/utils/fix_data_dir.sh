@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
 # This script makes sure that only the segments present in
-# all of "feats.scp", "wav.scp" [if present], segments [if present]
+# all of "feats.scp", "wav.scp" [if present], segments [if present]，
 # text, and utt2spk are present in any of them.
 # It puts the original contents of data-dir into
 # data-dir/.backup
+
 
 cmd="$@"
 
@@ -13,6 +14,8 @@ spk_extra_files=
 
 . utils/parse_options.sh
 
+
+# $# : number of parameters
 if [ $# != 1 ]; then
   echo "Usage: utils/data/fix_data_dir.sh <data-dir>"
   echo "e.g.: utils/data/fix_data_dir.sh data/train"
@@ -22,38 +25,46 @@ if [ $# != 1 ]; then
   exit 1
 fi
 
+
 data=$1
 
+# 什么意思？
 if [ -f $data/images.scp ]; then
   image/fix_data_dir.sh $cmd
   exit $?                           #  显示最后命令的退出状态。0表示没有错误，其他任何值表明有错误。
 fi
 
+
 mkdir -p $data/.backup
 
-[ ! -d $data ] && echo "$0: no such directory $data" && exit 1;
 
+[ ! -d $data ] && echo "$0: no such directory $data" && exit 1;
 [ ! -f $data/utt2spk ] && echo "$0: no such file $data/utt2spk" && exit 1;
 
+
 set -e -o pipefail -u               # 快速失败并检查退出状态(exit codes)
+
 
 tmpdir=$(mktemp -d /tmp/kaldi.XXXX);# 创建temporary文件或目录，返回名字
 # receive 'EXIT HUP INT PIPE TERM' execute "'rm -rf "$tmpdir"'"
 trap 'rm -rf "$tmpdir"' EXIT HUP INT PIPE TERM
 
+
 export LC_ALL=C
 
 
+# check sorted, k1
 function check_sorted {
   file=$1
   sort -k1,1 -u <$file >$file.tmp     # -k1,1 : start from f1, end at f1
-  if ! cmp -s $file $file.tmp; then   # -s : silent, suppress all normal output
+  if ! cmp -s $file $file.tmp; then   # -s : silent, suppress all normal output; Exit status is 0 if inputs are the same, 1 if different, 2 if trouble
     echo "$0: file $1 is not in sorted order or not unique, sorting it"
     mv $file.tmp $file
   else
     rm $file.tmp
   fi
 }
+
 
 for x in utt2spk spk2utt feats.scp text segments wav.scp cmvn.scp vad.scp \
     reco2file_and_channel spk2gender utt2lang utt2uniq utt2dur reco2dur utt2num_frames; do
@@ -67,8 +78,10 @@ done
 function filter_file {
   filter=$1
   file_to_filter=$2
+
   cp $file_to_filter ${file_to_filter}.tmp
   utils/filter_scp.pl $filter ${file_to_filter}.tmp > $file_to_filter
+
   if ! cmp ${file_to_filter}.tmp  $file_to_filter >&/dev/null; then
     length1=$(cat ${file_to_filter}.tmp | wc -l)
     length2=$(cat ${file_to_filter} | wc -l)
@@ -79,9 +92,10 @@ function filter_file {
   rm $file_to_filter.tmp
 }
 
+
+# TODO
 function filter_recordings {
-  # We call this once before the stage when we filter on utterance-id, and once
-  # after.
+  # We call this once before the stage when we filter on utterance-id, and once after.
 
   if [ -f $data/segments ]; then
   # We have a segments file -> we need to filter this and the file wav.scp, and
@@ -112,6 +126,7 @@ function filter_recordings {
   fi
 }
 
+
 function filter_speakers {
   # throughout this program, we regard utt2spk as primary and spk2utt as derived, so...
   utils/utt2spk_to_spk2utt.pl $data/utt2spk > $data/spk2utt
@@ -134,6 +149,7 @@ function filter_speakers {
     fi
   done
 }
+
 
 function filter_utts {
   cat $data/utt2spk | awk '{print $1}' > $tmpdir/utts
@@ -206,11 +222,13 @@ function filter_utts {
 
 }
 
+
 filter_recordings
 filter_speakers
 filter_utts
 filter_speakers
 filter_recordings
+
 
 utils/utt2spk_to_spk2utt.pl $data/utt2spk > $data/spk2utt
 
