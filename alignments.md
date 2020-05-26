@@ -11,8 +11,22 @@
     - DTW does not perform forced alignment, it will not tell you the HMM state corresponding to each frame, since there is no HMM involved in that algorithm.
     - [aeneas][3]
 - [phoneme to grapheme alignment][4]
+- [Disable optional silence][5]
+    - Possibly during training you did not put silence in your transcripts in all the places where silence actually appears(including at the beginning and end of utterances). `This would force the non-silence phones to learn to model silence also`. It might be better to train the system using the optional silence, and the prepare a different lang directory where you disable optional silence, and use that one to do the final alignment. Just make sure the phones.txt is the same.
+    - Sometimes, training with e.g. `--boost-silence 1.25` can help to avoid the non-silence phones modeling silence. And make sure you're extracting the alignments correctly(**should be OK if you're relying on the phoneme boundaries from the alignments, but might not be if you're relying on word labels in lattices and forgetting to do lattice-aligh-words or lattice-align-lexicion**).
+- [Align transcription with pre-trained model][6]
+    - `Chain models are not recommended for alignment`, and in general you are not seeing much difference between the standard-frame DNN models and SAT GMM models for the task for force alignment. Kaldi standard training framework is to train a gmm sat systems and to align with that to train a subsequent DNN model(chain or not).
+- [Data Alignment][7]
+    - `Indeed, it appears chain models are not the best choice for alignments`.
+- [nnet3 alignment issues][8]
+    - It's about the fact that `chain models are not good for alignment, since the objective function they are trained with does not force them to produce good alignments`, and (b)LSTM does not always produce good alignments. `Regardless, for force alignment i would generall recommend to use a GMM based model`.  It's much faster, and the performance of alignment is not very sensitive to how well a model performs in decoding.
+
 
 [1]:https://groups.google.com/forum/#!topic/kaldi-help/_Ij6L4uORBE
 [2]:https://groups.google.com/forum/#!searchin/kaldi-help/alignment|sort:date/kaldi-help/TKDf22Skmno/IFnxnBLnBwAJ
 [3]:https://github.com/readbeyond/aeneas
 [4]:https://groups.google.com/forum/#!searchin/kaldi-help/alignment|sort:date/kaldi-help/7ZWJd5fEVzQ/OiIMe0fSAQAJ
+[5]:https://groups.google.com/forum/#!topic/kaldi-help/IVev7biMkTw
+[6]:https://groups.google.com/forum/#!searchin/kaldi-help/chain$20alignment|sort:date/kaldi-help/vPFE0drJjwA/lIRyFbTgBgAJ
+[7]:https://groups.google.com/forum/#!searchin/kaldi-help/chain$20alignment|sort:date/kaldi-help/y51nL83HwJA/sjonAlkgAQAJ
+[8]:https://groups.google.com/forum/#!topic/kaldi-help/cSAm5iXGhZo

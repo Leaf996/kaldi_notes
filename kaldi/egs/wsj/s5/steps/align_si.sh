@@ -19,13 +19,14 @@ scale_opts="--transition-scale=1.0 --acoustic-scale=0.1 --self-loop-scale=0.1"
 beam=10
 retry_beam=40
 careful=false
-boost_silence=1.0 # Factor by which to boost silence during alignment.
+boost_silence=1.0   # Factor by which to boost silence during alignment.
 # End configuration options.
 
 echo "$0 $@"  # Print the command line for logging
 
 [ -f path.sh ] && . ./path.sh # source the path.
 . parse_options.sh || exit 1;
+
 
 if [ $# != 4 ]; then
    echo "usage: steps/align_si.sh <data-dir> <lang-dir> <src-dir> <align-dir>"
@@ -37,6 +38,7 @@ if [ $# != 4 ]; then
    echo "  --cmd (utils/run.pl|utils/queue.pl <queue opts>) # how to run jobs."
    exit 1;
 fi
+
 
 data=$1       # mfcc
 lang=$2       # utt-graph
