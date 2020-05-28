@@ -48,6 +48,7 @@ try:
 except:
     sys.exit("analyze_phone_length_stats.py: error opening or reading {0}/phones.txt".format(
             args.lang))
+
 # this is a special case... for begin- and end-of-sentence stats,
 # we group all nonsilence phones together.
 phone_int2text[0] = 'nonsilence'

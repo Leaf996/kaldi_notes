@@ -20,6 +20,12 @@
     - `Indeed, it appears chain models are not the best choice for alignments`.
 - [nnet3 alignment issues][8]
     - It's about the fact that `chain models are not good for alignment, since the objective function they are trained with does not force them to produce good alignments`, and (b)LSTM does not always produce good alignments. `Regardless, for force alignment i would generall recommend to use a GMM based model`.  It's much faster, and the performance of alignment is not very sensitive to how well a model performs in decoding.
+- [WARNING: optional-silence SIL is seen only 69.4736842105% of the time at utterance end. This may not be optimal][9]
+- [context dependency][10]
+    - Thins like context dependency could in theory make the alignments different from what a human would say.
+- [GMM-HMM][11]
+    - GMM-HMM has its own limitation, and 1k hours data won't help much.
+- [lattice for mmi training][12]
 
 
 [1]:https://groups.google.com/forum/#!topic/kaldi-help/_Ij6L4uORBE
@@ -30,3 +36,7 @@
 [6]:https://groups.google.com/forum/#!searchin/kaldi-help/chain$20alignment|sort:date/kaldi-help/vPFE0drJjwA/lIRyFbTgBgAJ
 [7]:https://groups.google.com/forum/#!searchin/kaldi-help/chain$20alignment|sort:date/kaldi-help/y51nL83HwJA/sjonAlkgAQAJ
 [8]:https://groups.google.com/forum/#!topic/kaldi-help/cSAm5iXGhZo
+[9]:https://groups.google.com/forum/#!topic/kaldi-help/V8p2LTlyjBE
+[10]:https://groups.google.com/forum/#!searchin/kaldi-help/gmm-hmm$20training|sort:date/kaldi-help/BkEub9VTUmk/ZJH8wz7pCAAJ
+[11]:https://groups.google.com/forum/#!searchin/kaldi-help/gmm-hmm$20training|sort:date/kaldi-help/rlQ0MIFsQJ4/ptt8_g_DAwAJ
+[12]:https://groups.google.com/forum/#!searchin/kaldi-help/gmm-hmm$20training|sort:date/kaldi-help/RNUpjyKTLZk/5XqQ7mT1BAAJ
