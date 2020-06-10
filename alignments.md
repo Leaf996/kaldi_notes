@@ -1,7 +1,7 @@
 # Alignments
 ## Problem with alignments
 - [The alignments of which have no sil at beginning, and they do have a sil at the beginning in the wave][1]
-    - Sometimes, the context-dependent phones eat up the adjacent silence. One way to discourage this from happening is to use the `--boost-silence-prob`, e.g. 1.25. And make sure you aren't using too many context-dependent phones(num-leaves too large) compared to you data.
+    - Sometimes, the context-dependent phones eat up the adjacent silence. One way to discourage this from happening is to use the `--boost-silence-prob`, e.g. 1.25. And make sure you aren't using too many context-dependent phones (**num-leaves too large**) compared to you data.
     - The WER of sMBR model is fine, although the alignment is not optimal. Models getting best WER do not necessarily produce most precise alignment. **That's true especially for the discriminatively trained models and RNNs**.
     - `--boost-silence = 1.5`, it helps to encourage the silence model to eat up more of the data, to avoid it getting modeled inappropritely by context-dependent phones.
     - Alignments are important, use a strong GMM or DNN-based system to generate the alignments.
